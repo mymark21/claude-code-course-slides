@@ -5,45 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claude Code 课程</title>
 
-    <!-- Fonts: JetBrains Mono for terminal aesthetic -->
+    <!-- Fonts: Elegant serif + clean sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 
     <style>
         /* ===========================================
            CSS CUSTOM PROPERTIES (THEME)
-           Terminal Green aesthetic
+           Paper & Ink - Wabi-Sabi Aesthetic
            =========================================== */
         :root {
-            /* Colors */
-            --bg-primary: #0d1117;
-            --bg-secondary: #161b22;
-            --bg-terminal: rgba(13, 17, 23, 0.95);
-            --text-primary: #c9d1d9;
-            --text-secondary: #8b949e;
-            --accent-green: #39d353;
-            --accent-cyan: #58a6ff;
-            --accent-yellow: #f0883e;
-            --accent-red: #f85149;
-            --border-color: #30363d;
+            /* Colors - Warm, natural palette */
+            --bg-cream: #faf9f7;
+            --bg-paper: #f5f3ee;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --accent-crimson: #c41e3a;
+            --accent-warm: #d4a574;
+            --accent-sage: #8b9d83;
+            --border-light: #e8e4df;
+            --border-medium: #d4cfc7;
 
             /* Typography */
-            --font-mono: 'JetBrains Mono', monospace;
-            --title-size: clamp(2rem, 6vw, 5rem);
+            --font-display: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            --font-body: 'Source Serif 4', serif;
+            --title-size: clamp(2rem, 6vw, 4.5rem);
             --h2-size: clamp(1.5rem, 4vw, 3rem);
             --h3-size: clamp(1.2rem, 3vw, 2rem);
-            --body-size: clamp(0.85rem, 1.5vw, 1.1rem);
-            --small-size: clamp(0.75rem, 1.2vw, 0.95rem);
+            --body-size: clamp(0.9rem, 1.5vw, 1.15rem);
+            --small-size: clamp(0.8rem, 1.2vw, 1rem);
 
             /* Spacing */
-            --slide-padding: clamp(1.5rem, 4vw, 4rem);
-            --content-gap: clamp(1rem, 2vw, 2rem);
-            --element-gap: clamp(0.5rem, 1vw, 1rem);
+            --slide-padding: clamp(2rem, 5vw, 5rem);
+            --content-gap: clamp(1.2rem, 2.5vw, 2.5rem);
+            --element-gap: clamp(0.6rem, 1.2vw, 1.2rem);
 
             /* Animation */
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-            --duration-normal: 0.6s;
+            --duration-normal: 0.7s;
         }
 
         /* ===========================================
@@ -52,15 +53,16 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: var(--font-mono);
-            background: var(--bg-primary);
+            font-family: var(--font-body);
+            background: var(--bg-cream);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.75;
             overflow-x: hidden;
+            font-feature-settings: "liga" 1, "calt" 1;
         }
 
         /* ===========================================
-           VIEWPORT FITTING: MANDATORY BASE STYLES
+           VIEWPORT FITTING
            =========================================== */
         html, body {
             height: 100%;
@@ -87,137 +89,139 @@
         }
 
         .slide-content {
-            max-width: min(90vw, 1000px);
+            max-width: min(85vw, 900px);
             max-height: 85vh;
             overflow: hidden;
+            position: relative;
         }
 
         /* ===========================================
-           TERMINAL AESTHETIC ELEMENTS
+           DECORATIVE ELEMENTS - Wabi-Sabi Details
            =========================================== */
 
-        /* Scan lines effect */
+        /* Subtle texture overlay */
         body::before {
             content: '';
             position: fixed;
             width: 100%;
             height: 100%;
-            background: repeating-linear-gradient(
-                0deg,
-                rgba(0, 0, 0, 0.15),
-                rgba(0, 0, 0, 0.15) 1px,
-                transparent 1px,
-                transparent 2px
-            );
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.01) 2px, rgba(0,0,0,0.01) 4px);
             pointer-events: none;
-            z-index: 9999;
-            animation: scanlines 8s linear infinite;
+            z-index: 1;
+            opacity: 0.3;
         }
 
-        @keyframes scanlines {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(10px); }
+        /* Corner ornaments */
+        .slide::before,
+        .slide::after {
+            content: '';
+            position: absolute;
+            width: clamp(40px, 5vw, 80px);
+            height: clamp(40px, 5vw, 80px);
+            border: 1px solid var(--border-medium);
+            pointer-events: none;
+            opacity: 0.4;
         }
 
-        /* Terminal window container */
-        .terminal-window {
-            background: var(--bg-terminal);
-            border: 2px solid var(--accent-green);
-            border-radius: 8px;
-            padding: clamp(1.5rem, 3vw, 2.5rem);
-            box-shadow: 0 0 40px rgba(57, 211, 83, 0.2);
-            width: 100%;
-            max-height: 100%;
-            overflow: hidden;
+        .slide::before {
+            top: var(--slide-padding);
+            left: var(--slide-padding);
+            border-right: none;
+            border-bottom: none;
         }
 
-        .terminal-header {
-            display: flex;
-            gap: 8px;
-            margin-bottom: var(--element-gap);
+        .slide::after {
+            bottom: var(--slide-padding);
+            right: var(--slide-padding);
+            border-left: none;
+            border-top: none;
         }
 
-        .terminal-dot {
-            width: 12px;
-            height: 12px;
+        /* Decorative line accent */
+        .slide-content::before {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--element-gap));
+            left: 0;
+            width: clamp(40px, 8vw, 80px);
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-crimson), transparent);
+            opacity: 0.6;
+        }
+
+        /* Small circle ornament */
+        .slide-content::after {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--element-gap) - 3px);
+            left: clamp(45px, 8.5vw, 85px);
+            width: 8px;
+            height: 8px;
+            border: 1px solid var(--accent-crimson);
             border-radius: 50%;
-            background: var(--accent-green);
-            animation: blink 1.5s ease-in-out infinite;
-        }
-
-        .terminal-dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent-yellow); }
-        .terminal-dot:nth-child(3) { animation-delay: 0.4s; background: var(--accent-red); }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        /* Prompt line */
-        .prompt {
-            color: var(--accent-green);
-            font-size: var(--small-size);
-            margin-bottom: var(--element-gap);
-            font-weight: 500;
-        }
-
-        .prompt::before {
-            content: '$ ';
-            color: var(--accent-cyan);
-        }
-
-        /* Cursor */
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2em;
-            background: var(--accent-green);
-            margin-left: 4px;
-            animation: cursorBlink 1s step-end infinite;
-        }
-
-        @keyframes cursorBlink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0; }
+            opacity: 0.6;
         }
 
         /* ===========================================
            TYPOGRAPHY
            =========================================== */
         h1 {
+            font-family: var(--font-display);
             font-size: var(--title-size);
             font-weight: 700;
-            color: var(--accent-green);
+            color: var(--text-primary);
             margin-bottom: var(--element-gap);
-            text-shadow: 0 0 20px rgba(57, 211, 83, 0.3);
             line-height: 1.2;
+            letter-spacing: -0.02em;
         }
 
         h2 {
+            font-family: var(--font-display);
             font-size: var(--h2-size);
-            font-weight: 700;
-            color: var(--accent-green);
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: var(--element-gap);
-            line-height: 1.2;
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            position: relative;
+            padding-top: var(--element-gap);
         }
 
         h3 {
+            font-family: var(--font-display);
             font-size: var(--h3-size);
             font-weight: 600;
-            color: var(--accent-cyan);
-            margin-bottom: var(--element-gap);
+            color: var(--accent-crimson);
+            margin-bottom: calc(var(--element-gap) * 0.75);
+            line-height: 1.4;
         }
 
         p, li {
             font-size: var(--body-size);
             color: var(--text-primary);
-            line-height: 1.6;
+            line-height: 1.75;
         }
 
         .subtitle {
             color: var(--text-secondary);
             font-size: var(--h3-size);
+            font-style: italic;
             margin-bottom: var(--content-gap);
+            font-weight: 400;
+        }
+
+        /* Section labels with decorative border */
+        .section-label {
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: var(--content-gap);
+            padding-bottom: calc(var(--element-gap) * 0.5);
+            border-bottom: 1px solid var(--border-light);
+            display: inline-block;
+            font-family: var(--font-body);
         }
 
         /* ===========================================
@@ -231,78 +235,121 @@
         }
 
         ul li {
-            padding-left: 1.5em;
+            padding-left: 1.8em;
             position: relative;
         }
 
         ul li::before {
-            content: '▸';
+            content: '—';
             position: absolute;
             left: 0;
-            color: var(--accent-green);
-            font-weight: 700;
+            color: var(--accent-crimson);
+            font-weight: 400;
+        }
+
+        /* Nested lists */
+        ul ul {
+            margin-top: calc(var(--element-gap) * 0.5);
+            gap: calc(var(--element-gap) * 0.75);
+        }
+
+        ul ul li {
+            font-size: calc(var(--body-size) * 0.95);
+            color: var(--text-secondary);
+        }
+
+        ul ul li::before {
+            content: '·';
+            color: var(--accent-warm);
         }
 
         /* ===========================================
            SPECIAL ELEMENTS
            =========================================== */
 
-        /* Code blocks */
-        code, .code {
-            background: var(--bg-secondary);
-            padding: 0.2em 0.5em;
-            border-radius: 4px;
-            color: var(--accent-cyan);
+        /* Code snippets */
+        code {
+            background: var(--bg-paper);
+            padding: 0.2em 0.6em;
+            border-radius: 3px;
+            color: var(--accent-crimson);
             font-size: 0.9em;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            border: 1px solid var(--border-light);
         }
 
-        /* Badges */
+        /* Badges with frame */
         .badge {
             display: inline-block;
-            padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
-            background: rgba(57, 211, 83, 0.1);
-            border: 1px solid var(--accent-green);
-            border-radius: 4px;
-            color: var(--accent-green);
+            padding: clamp(0.3rem, 0.8vw, 0.5rem) clamp(0.8rem, 1.8vw, 1.2rem);
+            background: transparent;
+            border: 1.5px solid var(--accent-sage);
+            color: var(--accent-sage);
             font-size: var(--small-size);
             font-weight: 600;
-            margin: 0.25rem;
+            margin: 0.2rem;
+            font-family: var(--font-body);
+            letter-spacing: 0.02em;
         }
 
         .badge.warning {
-            background: rgba(240, 136, 62, 0.1);
-            border-color: var(--accent-yellow);
-            color: var(--accent-yellow);
+            border-color: var(--accent-warm);
+            color: var(--accent-warm);
         }
 
         .badge.error {
-            background: rgba(248, 81, 73, 0.1);
-            border-color: var(--accent-red);
-            color: var(--accent-red);
+            border-color: var(--accent-crimson);
+            color: var(--accent-crimson);
         }
 
-        /* Section labels */
-        .section-label {
-            font-size: var(--small-size);
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: var(--element-gap);
-        }
-
-        /* Grid layouts */
+        /* Grid layouts with borders */
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
-            gap: var(--element-gap);
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: var(--content-gap);
             margin-top: var(--content-gap);
         }
 
         .grid-item {
-            background: var(--bg-secondary);
-            padding: clamp(1rem, 2vw, 1.5rem);
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
+            background: var(--bg-paper);
+            padding: clamp(1.2rem, 2.5vw, 2rem);
+            border: 1px solid var(--border-medium);
+            position: relative;
+        }
+
+        /* Corner detail on grid items */
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 12px;
+            height: 12px;
+            border-top: 2px solid var(--accent-crimson);
+            border-left: 2px solid var(--accent-crimson);
+        }
+
+        /* Title slide special styling */
+        .title-slide {
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-paper) 100%);
+        }
+
+        .title-slide .slide-content {
+            text-align: center;
+            border: 2px solid var(--border-medium);
+            padding: clamp(2rem, 5vw, 4rem);
+            background: var(--bg-cream);
+            position: relative;
+        }
+
+        /* Decorative corners on title */
+        .title-slide .slide-content::before,
+        .title-slide .slide-content::after {
+            display: none;
+        }
+
+        .title-slide .slide-content {
+            box-shadow: 0 0 0 8px var(--bg-cream), 0 0 0 9px var(--border-light);
         }
 
         /* ===========================================
@@ -310,7 +357,7 @@
            =========================================== */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(15px);
             transition: opacity var(--duration-normal) var(--ease-out-expo),
                         transform var(--duration-normal) var(--ease-out-expo);
         }
@@ -326,6 +373,7 @@
         .reveal:nth-child(4) { transition-delay: 0.4s; }
         .reveal:nth-child(5) { transition-delay: 0.5s; }
         .reveal:nth-child(6) { transition-delay: 0.6s; }
+        .reveal:nth-child(7) { transition-delay: 0.7s; }
 
         /* ===========================================
            NAVIGATION
@@ -334,46 +382,46 @@
             position: fixed;
             top: 0;
             left: 0;
-            height: 3px;
-            background: var(--accent-green);
+            height: 2px;
+            background: var(--accent-crimson);
             width: 0%;
             z-index: 10000;
             transition: width 0.3s ease;
-            box-shadow: 0 0 10px var(--accent-green);
         }
 
         .nav-dots {
             position: fixed;
-            right: clamp(1rem, 3vw, 2rem);
+            right: clamp(1.5rem, 4vw, 3rem);
             top: 50%;
             transform: translateY(-50%);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             z-index: 1000;
         }
 
         .nav-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--border-color);
+            width: 6px;
+            height: 6px;
+            border: 1px solid var(--border-medium);
+            background: transparent;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s var(--ease-out-expo);
         }
 
         .nav-dot.active {
-            background: var(--accent-green);
-            box-shadow: 0 0 10px var(--accent-green);
+            background: var(--accent-crimson);
+            border-color: var(--accent-crimson);
             transform: scale(1.5);
         }
 
         .nav-dot:hover {
-            background: var(--accent-cyan);
+            background: var(--accent-warm);
+            border-color: var(--accent-warm);
         }
 
         /* ===========================================
-           INLINE EDITING (User opted in)
+           INLINE EDITING
            =========================================== */
         .edit-hotzone {
             position: fixed;
@@ -387,21 +435,19 @@
 
         .edit-toggle {
             position: fixed;
-            top: 20px;
-            left: 20px;
-            background: var(--accent-green);
-            color: var(--bg-primary);
-            border: none;
-            border-radius: 6px;
-            padding: 10px 16px;
-            font-family: var(--font-mono);
-            font-size: 14px;
+            top: 24px;
+            left: 24px;
+            background: var(--bg-paper);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-medium);
+            padding: 10px 18px;
+            font-family: var(--font-body);
+            font-size: 13px;
             cursor: pointer;
             z-index: 10001;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 12px rgba(57, 211, 83, 0.3);
+            transition: all 0.3s ease;
         }
 
         .edit-toggle.show,
@@ -411,15 +457,17 @@
         }
 
         .edit-toggle.active {
-            background: var(--accent-red);
+            background: var(--accent-crimson);
+            color: var(--bg-cream);
+            border-color: var(--accent-crimson);
         }
 
         .edit-toggle:hover {
-            transform: scale(1.05);
+            border-color: var(--accent-crimson);
         }
 
         [contenteditable="true"] {
-            outline: 2px dashed var(--accent-cyan);
+            outline: 1px dashed var(--accent-crimson);
             outline-offset: 4px;
             cursor: text;
         }
@@ -429,21 +477,29 @@
            =========================================== */
         @media (max-height: 700px) {
             :root {
-                --slide-padding: clamp(1rem, 3vw, 2rem);
-                --content-gap: clamp(0.75rem, 1.5vw, 1.5rem);
-                --title-size: clamp(1.5rem, 5vw, 3rem);
-                --h2-size: clamp(1.2rem, 3.5vw, 2rem);
+                --slide-padding: clamp(1.5rem, 3.5vw, 2.5rem);
+                --content-gap: clamp(1rem, 2vw, 1.8rem);
+                --title-size: clamp(1.8rem, 5vw, 3rem);
+                --h2-size: clamp(1.3rem, 3.5vw, 2.2rem);
+            }
+
+            .slide::before,
+            .slide::after {
+                width: 30px;
+                height: 30px;
             }
         }
 
         @media (max-height: 600px) {
             :root {
-                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
-                --title-size: clamp(1.2rem, 4vw, 2rem);
-                --body-size: clamp(0.75rem, 1.2vw, 0.95rem);
+                --slide-padding: clamp(1rem, 3vw, 2rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.5rem);
+                --body-size: clamp(0.8rem, 1.3vw, 1rem);
             }
 
-            .nav-dots, .terminal-header {
+            .nav-dots,
+            .slide::before,
+            .slide::after {
                 display: none;
             }
         }
@@ -478,24 +534,17 @@
 
     <!-- Edit mode controls -->
     <div class="edit-hotzone"></div>
-    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️ Edit</button>
+    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">✎ 编辑</button>
 
     <!-- ==========================================
-         SLIDES START HERE
+         SLIDES
          ========================================== -->
 
     <!-- Slide 1: Title -->
-    <section class="slide">
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-            </div>
-            <div class="prompt reveal">cd ~/learning/claude-code</div>
+    <section class="slide title-slide">
+        <div class="slide-content">
             <h1 class="reveal">Claude Code 课程</h1>
-            <p class="subtitle reveal">Terminal-first AI 编程助手<span class="cursor"></span></p>
-            <div class="prompt reveal" style="margin-top: 2rem;">claude --help</div>
+            <p class="subtitle reveal">Terminal-first AI 编程助手</p>
         </div>
     </section>
 
@@ -521,11 +570,11 @@
                 <li class="reveal">当前可用模型一览（Sonnet / Opus / Haiku）</li>
                 <li class="reveal">切换命令：<code>/model</code></li>
                 <li class="reveal">选择原则：
-                    <div style="margin-top: 0.5rem; margin-left: 1.5rem;">
-                        <span class="badge">Opus</span> 复杂任务<br>
-                        <span class="badge">Sonnet</span> 日常使用<br>
-                        <span class="badge">Haiku</span> 省钱快速
-                    </div>
+                    <ul>
+                        <li><span class="badge">Opus</span> 复杂任务</li>
+                        <li><span class="badge">Sonnet</span> 日常使用</li>
+                        <li><span class="badge">Haiku</span> 省钱快速</li>
+                    </ul>
                 </li>
             </ul>
         </div>
@@ -537,12 +586,12 @@
             <h2 class="reveal">两种模式</h2>
             <div class="grid">
                 <div class="grid-item reveal">
-                    <h3 style="color: var(--accent-cyan); font-size: var(--body-size); margin-bottom: 0.5rem;">Plan 模式</h3>
-                    <p style="font-size: var(--small-size);">只分析、不动手 → 先看 Claude 的思路再决定是否执行</p>
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">Plan 模式</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary);">只分析、不动手 → 先看 Claude 的思路再决定是否执行</p>
                 </div>
                 <div class="grid-item reveal">
-                    <h3 style="color: var(--accent-green); font-size: var(--body-size); margin-bottom: 0.5rem;">Build 模式</h3>
-                    <p style="font-size: var(--small-size);">直接执行 → Claude 自主完成任务</p>
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">Build 模式</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary);">直接执行 → Claude 自主完成任务</p>
                 </div>
             </div>
             <ul style="margin-top: var(--content-gap);">
@@ -599,11 +648,11 @@
                 <li class="reveal">查看用量：<code>/cost</code></li>
                 <li class="reveal">Token 消耗来源：输入 / 输出 / 工具调用</li>
                 <li class="reveal">节省技巧：
-                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
-                        • 压缩对话<br>
-                        • 精准 prompt<br>
-                        • 避免重复上传大文件
-                    </div>
+                    <ul>
+                        <li>压缩对话</li>
+                        <li>精准 prompt</li>
+                        <li>避免重复上传大文件</li>
+                    </ul>
                 </li>
             </ul>
         </div>
@@ -641,11 +690,11 @@
             <ul>
                 <li class="reveal">不要盲目 Accept</li>
                 <li class="reveal">检查清单：
-                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
-                        • 逻辑对吗？<br>
-                        • 副作用？<br>
-                        • 有没有删了不该删的？
-                    </div>
+                    <ul>
+                        <li>逻辑对吗？</li>
+                        <li>副作用？</li>
+                        <li>有没有删了不该删的？</li>
+                    </ul>
                 </li>
                 <li class="reveal">养成习惯：<code>git diff</code> 看每一次变更</li>
             </ul>
@@ -723,11 +772,11 @@
                 <li class="reveal">MCP = Model Context Protocol</li>
                 <li class="reveal">类比：给 Claude 装插件</li>
                 <li class="reveal">重点介绍 3 个：
-                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
-                        <span class="badge">browser</span> 操控浏览器<br>
-                        <span class="badge">filesystem</span> 读写本地文件<br>
-                        <span class="badge">github</span> 仓库操作
-                    </div>
+                    <ul>
+                        <li><span class="badge">browser</span> 操控浏览器</li>
+                        <li><span class="badge">filesystem</span> 读写本地文件</li>
+                        <li><span class="badge">github</span> 仓库操作</li>
+                    </ul>
                 </li>
                 <li class="reveal">配置方式：<code>claude_desktop_config.json</code></li>
             </ul>
@@ -797,19 +846,13 @@
 
     <!-- Slide 23: 总结 & 资源 -->
     <section class="slide">
-        <div class="terminal-window">
-            <div class="terminal-header">
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-                <div class="terminal-dot"></div>
-            </div>
-            <h2 class="reveal" style="color: var(--accent-green); margin-bottom: 1.5rem;">总结 & 资源</h2>
-            <ul style="font-size: var(--body-size);">
+        <div class="slide-content">
+            <h2 class="reveal">总结 & 资源</h2>
+            <ul>
                 <li class="reveal">学习路径回顾：基础 → 心法 → 进阶 → 实战</li>
                 <li class="reveal">推荐资源：官方文档 / MCP 市场 / GitHub</li>
                 <li class="reveal">下一步：挑一个 Demo，今天就跑起来</li>
             </ul>
-            <div class="prompt reveal" style="margin-top: 2rem;">$ claude --version<span class="cursor"></span></div>
         </div>
     </section>
 
@@ -819,7 +862,6 @@
     <script>
         /* ===========================================
            SLIDE PRESENTATION CONTROLLER
-           Handles navigation, animations, and interactions
            =========================================== */
         class SlidePresentation {
             constructor() {
@@ -836,7 +878,6 @@
             }
 
             setupIntersectionObserver() {
-                // Add .visible class when slides enter viewport for animations
                 const options = {
                     root: null,
                     threshold: 0.5
@@ -858,7 +899,6 @@
 
             setupKeyboardNav() {
                 document.addEventListener('keydown', (e) => {
-                    // Skip if editing text
                     if (e.target.getAttribute('contenteditable')) return;
 
                     switch(e.key) {
@@ -987,7 +1027,6 @@
 
         /* ===========================================
            INLINE EDITOR
-           Allows editing text directly in the browser
            =========================================== */
         class InlineEditor {
             constructor() {
@@ -1007,7 +1046,6 @@
                     this.toggleEditMode();
                 });
 
-                // Keep button visible when hovering over it
                 this.editToggle.addEventListener('mouseenter', () => {
                     clearTimeout(this.hideTimeout);
                 });
@@ -1022,7 +1060,6 @@
             }
 
             setupHotzone() {
-                // Show button on hotzone hover
                 this.hotzone.addEventListener('mouseenter', () => {
                     clearTimeout(this.hideTimeout);
                     this.editToggle.classList.add('show');
@@ -1036,7 +1073,6 @@
                     }, 400);
                 });
 
-                // Direct click on hotzone toggles edit mode
                 this.hotzone.addEventListener('click', () => {
                     this.toggleEditMode();
                 });
@@ -1044,12 +1080,10 @@
 
             setupKeyboardShortcut() {
                 document.addEventListener('keydown', (e) => {
-                    // E key toggles edit mode (skip when already editing)
                     if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
                         this.toggleEditMode();
                     }
 
-                    // Ctrl+S / Cmd+S saves
                     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
                         e.preventDefault();
                         if (this.isActive) {
@@ -1065,19 +1099,18 @@
 
                 if (this.isActive) {
                     this.enableEditing();
-                    this.editToggle.textContent = '💾 Save';
+                    this.editToggle.textContent = '💾 保存';
                     this.editToggle.classList.add('active');
                 } else {
                     this.disableEditing();
                     this.saveToStorage();
-                    this.editToggle.textContent = '✏️ Edit';
+                    this.editToggle.textContent = '✎ 编辑';
                     this.editToggle.classList.remove('active');
                 }
             }
 
             enableEditing() {
-                // Make all text elements editable
-                const editableSelectors = 'h1, h2, h3, p, li, .prompt, .subtitle, .section-label';
+                const editableSelectors = 'h1, h2, h3, p, li, .subtitle, .section-label';
                 document.querySelectorAll(editableSelectors).forEach(el => {
                     el.setAttribute('contenteditable', 'true');
                 });
@@ -1094,11 +1127,11 @@
                 document.querySelectorAll('.slide').forEach((slide, index) => {
                     data[`slide-${index}`] = slide.innerHTML;
                 });
-                localStorage.setItem('claude-code-slides', JSON.stringify(data));
+                localStorage.setItem('claude-code-slides-wabi', JSON.stringify(data));
             }
 
             loadFromStorage() {
-                const saved = localStorage.getItem('claude-code-slides');
+                const saved = localStorage.getItem('claude-code-slides-wabi');
                 if (saved) {
                     const data = JSON.parse(saved);
                     document.querySelectorAll('.slide').forEach((slide, index) => {
@@ -1111,18 +1144,17 @@
 
             showSaveNotification() {
                 const notification = document.createElement('div');
-                notification.textContent = '✓ Saved';
+                notification.textContent = '✓ 已保存';
                 notification.style.cssText = `
                     position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: var(--accent-green);
-                    color: var(--bg-primary);
-                    padding: 12px 20px;
-                    border-radius: 6px;
-                    font-family: var(--font-mono);
+                    top: 24px;
+                    right: 24px;
+                    background: var(--accent-crimson);
+                    color: var(--bg-cream);
+                    padding: 12px 24px;
+                    border: 1px solid var(--accent-crimson);
+                    font-family: var(--font-body);
                     font-size: 14px;
-                    font-weight: 600;
                     z-index: 10002;
                     animation: fadeIn 0.3s ease;
                 `;

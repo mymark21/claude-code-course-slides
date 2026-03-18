@@ -1,16 +1,14 @@
 # Claude Code 课程演示
 
-两种风格的 Claude Code 课程演示文稿：
+日系侘寂风格的 Claude Code 课程演示文稿。
 
-## 🎨 风格选择
+## 🎨 设计特点
 
-### 日系侘寂风格（推荐）
-- 文件：[claude-code-course-wabi-sabi.html](claude-code-course-wabi-sabi.html)
-- 特点：温暖米色背景、优雅衬线字体、精致框线装饰
-
-### 终端绿色风格
-- 文件：[claude-code-course.html](claude-code-course.html)
-- 特点：GitHub 暗色主题、终端美学、扫描线效果
+- 温暖的米色/奶油色背景
+- 优雅的中文衬线字体（思源宋体）+ 西文衬线字体
+- 精致的框线装饰（四角边框、顶部装饰线、圆点）
+- 克制的配色（深红、暖棕、鼠尾草绿）
+- 细腻的边框和分隔线
 
 ## 📖 内容大纲
 
@@ -31,15 +29,17 @@
 - 点击任意文本编辑
 - `Ctrl+S` / `Cmd+S`：保存（自动保存到 localStorage）
 
-## 🎨 自定义
+## 🎨 自定义配色
 
-编辑 HTML 文件中的 CSS 变量即可自定义配色：
+编辑 `claude-code-course.html` 文件中的 CSS 变量：
 
 ```css
 :root {
     --bg-cream: #faf9f7;
     --text-primary: #1a1a1a;
     --accent-crimson: #c41e3a;
+    --accent-warm: #d4a574;
+    --accent-sage: #8b9d83;
     /* ... */
 }
 ```
@@ -47,3 +47,8 @@
 ## 📝 源文件
 
 - 内容大纲：[claude_code_slides.md](claude_code_slides.md)
+- 演示文稿：[claude-code-course.html](claude-code-course.html)
+
+## 🌐 在线访问
+
+https://mymark21.github.io/claude-code-course-slides/
