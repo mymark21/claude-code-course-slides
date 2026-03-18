@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 课程</title>
+
+    <!-- Fonts: JetBrains Mono for terminal aesthetic -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           Terminal Green aesthetic
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-terminal: rgba(13, 17, 23, 0.95);
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent-green: #39d353;
+            --accent-cyan: #58a6ff;
+            --accent-yellow: #f0883e;
+            --accent-red: #f85149;
+            --border-color: #30363d;
+
+            /* Typography */
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 6vw, 5rem);
+            --h2-size: clamp(1.5rem, 4vw, 3rem);
+            --h3-size: clamp(1.2rem, 3vw, 2rem);
+            --body-size: clamp(0.85rem, 1.5vw, 1.1rem);
+            --small-size: clamp(0.75rem, 1.2vw, 0.95rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(1rem, 2vw, 2rem);
+            --element-gap: clamp(0.5rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           BASE STYLES
+           =========================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-mono);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+        }
+
+        .slide-content {
+            max-width: min(90vw, 1000px);
+            max-height: 85vh;
+            overflow: hidden;
+        }
+
+        /* ===========================================
+           TERMINAL AESTHETIC ELEMENTS
+           =========================================== */
+
+        /* Scan lines effect */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 9999;
+            animation: scanlines 8s linear infinite;
+        }
+
+        @keyframes scanlines {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        /* Terminal window container */
+        .terminal-window {
+            background: var(--bg-terminal);
+            border: 2px solid var(--accent-green);
+            border-radius: 8px;
+            padding: clamp(1.5rem, 3vw, 2.5rem);
+            box-shadow: 0 0 40px rgba(57, 211, 83, 0.2);
+            width: 100%;
+            max-height: 100%;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: var(--element-gap);
+        }
+
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: blink 1.5s ease-in-out infinite;
+        }
+
+        .terminal-dot:nth-child(2) { animation-delay: 0.2s; background: var(--accent-yellow); }
+        .terminal-dot:nth-child(3) { animation-delay: 0.4s; background: var(--accent-red); }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Prompt line */
+        .prompt {
+            color: var(--accent-green);
+            font-size: var(--small-size);
+            margin-bottom: var(--element-gap);
+            font-weight: 500;
+        }
+
+        .prompt::before {
+            content: '$ ';
+            color: var(--accent-cyan);
+        }
+
+        /* Cursor */
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background: var(--accent-green);
+            margin-left: 4px;
+            animation: cursorBlink 1s step-end infinite;
+        }
+
+        @keyframes cursorBlink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1 {
+            font-size: var(--title-size);
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: var(--element-gap);
+            text-shadow: 0 0 20px rgba(57, 211, 83, 0.3);
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: var(--h2-size);
+            font-weight: 700;
+            color: var(--accent-green);
+            margin-bottom: var(--element-gap);
+            line-height: 1.2;
+        }
+
+        h3 {
+            font-size: var(--h3-size);
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: var(--element-gap);
+        }
+
+        p, li {
+            font-size: var(--body-size);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: var(--h3-size);
+            margin-bottom: var(--content-gap);
+        }
+
+        /* ===========================================
+           LISTS
+           =========================================== */
+        ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: var(--element-gap);
+        }
+
+        ul li {
+            padding-left: 1.5em;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--accent-green);
+            font-weight: 700;
+        }
+
+        /* ===========================================
+           SPECIAL ELEMENTS
+           =========================================== */
+
+        /* Code blocks */
+        code, .code {
+            background: var(--bg-secondary);
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            color: var(--accent-cyan);
+            font-size: 0.9em;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: clamp(0.4rem, 1vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem);
+            background: rgba(57, 211, 83, 0.1);
+            border: 1px solid var(--accent-green);
+            border-radius: 4px;
+            color: var(--accent-green);
+            font-size: var(--small-size);
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.warning {
+            background: rgba(240, 136, 62, 0.1);
+            border-color: var(--accent-yellow);
+            color: var(--accent-yellow);
+        }
+
+        .badge.error {
+            background: rgba(248, 81, 73, 0.1);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Section labels */
+        .section-label {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: var(--element-gap);
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: var(--element-gap);
+            margin-top: var(--content-gap);
+        }
+
+        .grid-item {
+            background: var(--bg-secondary);
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal:nth-child(1) { transition-delay: 0.1s; }
+        .reveal:nth-child(2) { transition-delay: 0.2s; }
+        .reveal:nth-child(3) { transition-delay: 0.3s; }
+        .reveal:nth-child(4) { transition-delay: 0.4s; }
+        .reveal:nth-child(5) { transition-delay: 0.5s; }
+        .reveal:nth-child(6) { transition-delay: 0.6s; }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent-green);
+            width: 0%;
+            z-index: 10000;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: clamp(1rem, 3vw, 2rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+            transform: scale(1.5);
+        }
+
+        .nav-dot:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* ===========================================
+           INLINE EDITING (User opted in)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 80px;
+            height: 80px;
+            z-index: 10000;
+            cursor: pointer;
+        }
+
+        .edit-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-family: var(--font-mono);
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 10001;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 12px rgba(57, 211, 83, 0.3);
+        }
+
+        .edit-toggle.show,
+        .edit-toggle.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .edit-toggle.active {
+            background: var(--accent-red);
+        }
+
+        .edit-toggle:hover {
+            transform: scale(1.05);
+        }
+
+        [contenteditable="true"] {
+            outline: 2px dashed var(--accent-cyan);
+            outline-offset: 4px;
+            cursor: text;
+        }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1rem, 3vw, 2rem);
+                --content-gap: clamp(0.75rem, 1.5vw, 1.5rem);
+                --title-size: clamp(1.5rem, 5vw, 3rem);
+                --h2-size: clamp(1.2rem, 3.5vw, 2rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 2.5vw, 1.5rem);
+                --title-size: clamp(1.2rem, 4vw, 2rem);
+                --body-size: clamp(0.75rem, 1.2vw, 0.95rem);
+            }
+
+            .nav-dots, .terminal-header {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===========================================
+           REDUCED MOTION
+           =========================================== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+
+            html {
+                scroll-behavior: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Progress bar -->
+    <div class="progress-bar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots"></nav>
+
+    <!-- Edit mode controls -->
+    <div class="edit-hotzone"></div>
+    <button class="edit-toggle" id="editToggle" title="Edit mode (E)">✏️ Edit</button>
+
+    <!-- ==========================================
+         SLIDES START HERE
+         ========================================== -->
+
+    <!-- Slide 1: Title -->
+    <section class="slide">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+            <div class="prompt reveal">cd ~/learning/claude-code</div>
+            <h1 class="reveal">Claude Code 课程</h1>
+            <p class="subtitle reveal">Terminal-first AI 编程助手<span class="cursor"></span></p>
+            <div class="prompt reveal" style="margin-top: 2rem;">claude --help</div>
+        </div>
+    </section>
+
+    <!-- Slide 2: 从文件夹开始 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">🟦 PART 1: 基础</div>
+            <h2 class="reveal">从文件夹开始</h2>
+            <ul>
+                <li class="reveal">✅ 正确姿势：<code>cd 项目目录</code> → <code>claude</code></li>
+                <li class="reveal">❌ 错误姿势：根目录启动</li>
+                <li class="reveal">为什么：上下文 = 项目范围</li>
+                <li class="reveal">类比：给人讲任务，先说清楚"在哪个项目里"</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 3: 认识模型 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">认识模型</h2>
+            <ul>
+                <li class="reveal">当前可用模型一览（Sonnet / Opus / Haiku）</li>
+                <li class="reveal">切换命令：<code>/model</code></li>
+                <li class="reveal">选择原则：
+                    <div style="margin-top: 0.5rem; margin-left: 1.5rem;">
+                        <span class="badge">Opus</span> 复杂任务<br>
+                        <span class="badge">Sonnet</span> 日常使用<br>
+                        <span class="badge">Haiku</span> 省钱快速
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 4: 两种模式 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">两种模式</h2>
+            <div class="grid">
+                <div class="grid-item reveal">
+                    <h3 style="color: var(--accent-cyan); font-size: var(--body-size); margin-bottom: 0.5rem;">Plan 模式</h3>
+                    <p style="font-size: var(--small-size);">只分析、不动手 → 先看 Claude 的思路再决定是否执行</p>
+                </div>
+                <div class="grid-item reveal">
+                    <h3 style="color: var(--accent-green); font-size: var(--body-size); margin-bottom: 0.5rem;">Build 模式</h3>
+                    <p style="font-size: var(--small-size);">直接执行 → Claude 自主完成任务</p>
+                </div>
+            </div>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">原则：复杂/高风险任务先 Plan，确认没问题再 Build</li>
+                <li class="reveal">类比：Plan = 看设计图，Build = 开始施工</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 5: 打断 & 撤回 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">打断 & 撤回</h2>
+            <ul>
+                <li class="reveal"><span class="badge">ESC</span> 打断 → 中断执行 → 立即补充新方向</li>
+                <li class="reveal"><span class="badge">ESC ESC</span> 撤回 → 回到上一条消息发送前的状态</li>
+                <li class="reveal">区别：单击 = 转向，双击 = 时光倒流</li>
+                <li class="reveal">类比：单击是"等等，换个思路"；双击是"这条路走错了，整个重来"</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 6: 处理上下文 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">处理上下文</h2>
+            <ul>
+                <li class="reveal">原则：<strong>一个对话 = 一个问题</strong></li>
+                <li class="reveal">对话变长时：<code>/compact</code> 压缩上下文</li>
+                <li class="reveal">回到旧对话：<code>/resume</code> + 对话 ID</li>
+                <li class="reveal">为什么重要：上下文污染 → 输出质量下降</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 7: CLAUDE.md -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">CLAUDE.md（项目记忆）</h2>
+            <ul>
+                <li class="reveal">是什么：项目根目录的说明文件</li>
+                <li class="reveal">Claude 每次启动自动读取</li>
+                <li class="reveal">写什么：技术栈、规范、禁止事项、常用路径</li>
+                <li class="reveal">类比：新员工入职手册</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 8: 费用感知 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">费用感知</h2>
+            <ul>
+                <li class="reveal">查看用量：<code>/cost</code></li>
+                <li class="reveal">Token 消耗来源：输入 / 输出 / 工具调用</li>
+                <li class="reveal">节省技巧：
+                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
+                        • 压缩对话<br>
+                        • 精准 prompt<br>
+                        • 避免重复上传大文件
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 9: 第一条 Prompt 怎么写 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">🟧 PART 2: 工作流心法</div>
+            <h2 class="reveal">第一条 Prompt 怎么写</h2>
+            <ul>
+                <li class="reveal">给背景 → 说目标 → 说约束</li>
+                <li class="reveal">模板：<code>我在做 [X]，需要 [Y]，要求 [Z]</code></li>
+                <li class="reveal"><span class="badge error">不要</span> 只说"帮我写个网站"</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 10: 什么时候新开对话 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">什么时候新开对话</h2>
+            <ul>
+                <li class="reveal">✅ 新开：换了任务目标 / 上下文超长 / 输出开始漂移</li>
+                <li class="reveal">✅ 继续：同一问题的追问 / 小修改</li>
+                <li class="reveal">判断标准：Claude 还记得"我们在做什么"吗？</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 11: 如何 Review 输出 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">如何 Review 输出</h2>
+            <ul>
+                <li class="reveal">不要盲目 Accept</li>
+                <li class="reveal">检查清单：
+                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
+                        • 逻辑对吗？<br>
+                        • 副作用？<br>
+                        • 有没有删了不该删的？
+                    </div>
+                </li>
+                <li class="reveal">养成习惯：<code>git diff</code> 看每一次变更</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 12: 更好的终端：Ghostty -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">🟥 PART 3: 进阶</div>
+            <h2 class="reveal">更好的终端：Ghostty</h2>
+            <ul>
+                <li class="reveal">为什么换：性能、字体渲染、原生 macOS 体验</li>
+                <li class="reveal">核心技巧：<strong>拖动文件夹</strong> → 自动 <code>cd</code> 到该目录</li>
+                <li class="reveal">配置推荐：字体 / 透明度 / 快捷键</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 13: 自举：让 Claude 改自己 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">自举：让 Claude 改自己</h2>
+            <ul>
+                <li class="reveal">概念：用 Claude Code 修改 Claude Code 的配置和脚本</li>
+                <li class="reveal">场景：自动生成 CLAUDE.md、优化自己的 workflow</li>
+                <li class="reveal">Wow moment：Claude 给自己写工具</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 14: 快捷键 & Permission 模式 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">快捷键 & Permission 模式</h2>
+            <ul>
+                <li class="reveal"><code>cc</code> 别名 = 快速启动</li>
+                <li class="reveal">Permission pass 状态：跳过每次操作确认</li>
+                <li class="reveal">适用场景：信任度高的任务 / 自动化流水线</li>
+                <li class="reveal"><span class="badge warning">⚠️ 注意</span> 不建议在陌生代码库开启</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 15: Agent 蜂群模式 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Agent 蜂群模式</h2>
+            <ul>
+                <li class="reveal">概念：一个主 agent → 派发多个 sub-agent 并行工作</li>
+                <li class="reveal">场景举例：同时爬数据 + 写文章 + 生成图片描述</li>
+                <li class="reveal">关键：任务拆解要清晰，子任务相互独立</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 16: Skill 体系 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Skill 体系</h2>
+            <ul>
+                <li class="reveal">定义：可复用的 prompt 模板 + 上下文包</li>
+                <li class="reveal"><strong>触发原则：做过 3 次 → 值得做成 skill</strong></li>
+                <li class="reveal">结构：名称 / 触发词 / 模板内容 / 示例</li>
+                <li class="reveal">存放位置：<code>.claude/skills/</code></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 17: MCP：让 Claude 连接世界 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">MCP：让 Claude 连接世界</h2>
+            <ul>
+                <li class="reveal">MCP = Model Context Protocol</li>
+                <li class="reveal">类比：给 Claude 装插件</li>
+                <li class="reveal">重点介绍 3 个：
+                    <div style="margin-top: 0.5rem; margin-left: 1.5rem; font-size: var(--small-size);">
+                        <span class="badge">browser</span> 操控浏览器<br>
+                        <span class="badge">filesystem</span> 读写本地文件<br>
+                        <span class="badge">github</span> 仓库操作
+                    </div>
+                </li>
+                <li class="reveal">配置方式：<code>claude_desktop_config.json</code></li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 18: Agent 完备：渐进式披露 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Agent 完备：渐进式披露</h2>
+            <ul>
+                <li class="reveal">概念：Claude 自己配置自己的工具链</li>
+                <li class="reveal">流程：需求 → Claude 分析 → 推荐 MCP → 自动写配置</li>
+                <li class="reveal"><code>cc</code> 配置其他工具的 demo</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 19: Demo 1：创建网站 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">🟩 PART 4: Demo</div>
+            <h2 class="reveal">Demo 1：创建网站</h2>
+            <ul>
+                <li class="reveal">输入：一句话描述</li>
+                <li class="reveal">过程：Claude 选技术栈 → 生成文件结构 → 写代码 → 本地预览</li>
+                <li class="reveal">重点展示：多文件协作能力</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 20: Demo 2：文章写作 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Demo 2：文章写作</h2>
+            <ul>
+                <li class="reveal">场景：给定主题 → 调研 + 生成大纲 + 完整成文</li>
+                <li class="reveal">配合 MCP browser：实时搜索资料</li>
+                <li class="reveal">技巧：Skill 固定写作风格</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 21: Demo 3：网站 SEO 工作流 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Demo 3：网站 SEO 工作流</h2>
+            <ul>
+                <li class="reveal">分析现有页面 → 生成 SEO 建议 → 自动修改 meta/结构</li>
+                <li class="reveal">工具链：browser MCP + filesystem MCP</li>
+                <li class="reveal">输出：改动报告 + diff</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 22: Demo 4：RPA 自动化浏览器 -->
+    <section class="slide">
+        <div class="slide-content">
+            <h2 class="reveal">Demo 4：RPA 自动化浏览器</h2>
+            <ul>
+                <li class="reveal">场景：批量表单填写 / 数据采集 / 定时操作</li>
+                <li class="reveal">依赖：browser MCP（Playwright/Puppeteer）</li>
+                <li class="reveal">展示：Claude 写脚本 → 自动执行 → 返回结果</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Slide 23: 总结 & 资源 -->
+    <section class="slide">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+                <div class="terminal-dot"></div>
+            </div>
+            <h2 class="reveal" style="color: var(--accent-green); margin-bottom: 1.5rem;">总结 & 资源</h2>
+            <ul style="font-size: var(--body-size);">
+                <li class="reveal">学习路径回顾：基础 → 心法 → 进阶 → 实战</li>
+                <li class="reveal">推荐资源：官方文档 / MCP 市场 / GitHub</li>
+                <li class="reveal">下一步：挑一个 Demo，今天就跑起来</li>
+            </ul>
+            <div class="prompt reveal" style="margin-top: 2rem;">$ claude --version<span class="cursor"></span></div>
+        </div>
+    </section>
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ========================================== -->
+    <script>
+        /* ===========================================
+           SLIDE PRESENTATION CONTROLLER
+           Handles navigation, animations, and interactions
+           =========================================== */
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.isScrolling = false;
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+                this.setupMouseWheelNav();
+            }
+
+            setupIntersectionObserver() {
+                // Add .visible class when slides enter viewport for animations
+                const options = {
+                    root: null,
+                    threshold: 0.5
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            this.currentSlide = Array.from(this.slides).indexOf(entry.target);
+                            this.updateProgress();
+                            this.updateNavDots();
+                        }
+                    });
+                }, options);
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    // Skip if editing text
+                    if (e.target.getAttribute('contenteditable')) return;
+
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.nextSlide();
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.prevSlide();
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.slides.length - 1);
+                            break;
+                    }
+                });
+            }
+
+            setupTouchNav() {
+                let touchStartY = 0;
+                let touchEndY = 0;
+
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.changedTouches[0].screenY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    touchEndY = e.changedTouches[0].screenY;
+                    this.handleSwipe();
+                }, { passive: true });
+
+                const handleSwipe = () => {
+                    const swipeThreshold = 50;
+                    const diff = touchStartY - touchEndY;
+
+                    if (Math.abs(diff) > swipeThreshold) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                    }
+                };
+
+                this.handleSwipe = handleSwipe;
+            }
+
+            setupMouseWheelNav() {
+                let wheelTimeout;
+                document.addEventListener('wheel', (e) => {
+                    if (this.isScrolling) return;
+
+                    clearTimeout(wheelTimeout);
+                    wheelTimeout = setTimeout(() => {
+                        if (e.deltaY > 0) {
+                            this.nextSlide();
+                        } else if (e.deltaY < 0) {
+                            this.prevSlide();
+                        }
+                    }, 50);
+                }, { passive: true });
+            }
+
+            setupProgressBar() {
+                this.progressBar = document.querySelector('.progress-bar');
+                this.updateProgress();
+            }
+
+            setupNavDots() {
+                const navDots = document.querySelector('.nav-dots');
+                this.slides.forEach((slide, index) => {
+                    const dot = document.createElement('div');
+                    dot.className = 'nav-dot';
+                    if (index === 0) dot.classList.add('active');
+                    dot.addEventListener('click', () => this.goToSlide(index));
+                    navDots.appendChild(dot);
+                });
+                this.navDots = document.querySelectorAll('.nav-dot');
+            }
+
+            updateProgress() {
+                const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+                this.progressBar.style.width = `${progress}%`;
+            }
+
+            updateNavDots() {
+                this.navDots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === this.currentSlide);
+                });
+            }
+
+            nextSlide() {
+                if (this.currentSlide < this.slides.length - 1) {
+                    this.goToSlide(this.currentSlide + 1);
+                }
+            }
+
+            prevSlide() {
+                if (this.currentSlide > 0) {
+                    this.goToSlide(this.currentSlide - 1);
+                }
+            }
+
+            goToSlide(index) {
+                if (this.isScrolling) return;
+                this.isScrolling = true;
+
+                this.currentSlide = index;
+                this.slides[index].scrollIntoView({ behavior: 'smooth' });
+
+                setTimeout(() => {
+                    this.isScrolling = false;
+                }, 800);
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITOR
+           Allows editing text directly in the browser
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.editToggle = document.getElementById('editToggle');
+                this.hotzone = document.querySelector('.edit-hotzone');
+                this.hideTimeout = null;
+
+                this.setupEditToggle();
+                this.setupHotzone();
+                this.setupKeyboardShortcut();
+                this.loadFromStorage();
+            }
+
+            setupEditToggle() {
+                this.editToggle.addEventListener('click', () => {
+                    this.toggleEditMode();
+                });
+
+                // Keep button visible when hovering over it
+                this.editToggle.addEventListener('mouseenter', () => {
+                    clearTimeout(this.hideTimeout);
+                });
+
+                this.editToggle.addEventListener('mouseleave', () => {
+                    this.hideTimeout = setTimeout(() => {
+                        if (!this.isActive) {
+                            this.editToggle.classList.remove('show');
+                        }
+                    }, 400);
+                });
+            }
+
+            setupHotzone() {
+                // Show button on hotzone hover
+                this.hotzone.addEventListener('mouseenter', () => {
+                    clearTimeout(this.hideTimeout);
+                    this.editToggle.classList.add('show');
+                });
+
+                this.hotzone.addEventListener('mouseleave', () => {
+                    this.hideTimeout = setTimeout(() => {
+                        if (!this.isActive) {
+                            this.editToggle.classList.remove('show');
+                        }
+                    }, 400);
+                });
+
+                // Direct click on hotzone toggles edit mode
+                this.hotzone.addEventListener('click', () => {
+                    this.toggleEditMode();
+                });
+            }
+
+            setupKeyboardShortcut() {
+                document.addEventListener('keydown', (e) => {
+                    // E key toggles edit mode (skip when already editing)
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        this.toggleEditMode();
+                    }
+
+                    // Ctrl+S / Cmd+S saves
+                    if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                        e.preventDefault();
+                        if (this.isActive) {
+                            this.saveToStorage();
+                            this.showSaveNotification();
+                        }
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+
+                if (this.isActive) {
+                    this.enableEditing();
+                    this.editToggle.textContent = '💾 Save';
+                    this.editToggle.classList.add('active');
+                } else {
+                    this.disableEditing();
+                    this.saveToStorage();
+                    this.editToggle.textContent = '✏️ Edit';
+                    this.editToggle.classList.remove('active');
+                }
+            }
+
+            enableEditing() {
+                // Make all text elements editable
+                const editableSelectors = 'h1, h2, h3, p, li, .prompt, .subtitle, .section-label';
+                document.querySelectorAll(editableSelectors).forEach(el => {
+                    el.setAttribute('contenteditable', 'true');
+                });
+            }
+
+            disableEditing() {
+                document.querySelectorAll('[contenteditable]').forEach(el => {
+                    el.removeAttribute('contenteditable');
+                });
+            }
+
+            saveToStorage() {
+                const data = {};
+                document.querySelectorAll('.slide').forEach((slide, index) => {
+                    data[`slide-${index}`] = slide.innerHTML;
+                });
+                localStorage.setItem('claude-code-slides', JSON.stringify(data));
+            }
+
+            loadFromStorage() {
+                const saved = localStorage.getItem('claude-code-slides');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    document.querySelectorAll('.slide').forEach((slide, index) => {
+                        if (data[`slide-${index}`]) {
+                            slide.innerHTML = data[`slide-${index}`];
+                        }
+                    });
+                }
+            }
+
+            showSaveNotification() {
+                const notification = document.createElement('div');
+                notification.textContent = '✓ Saved';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--accent-green);
+                    color: var(--bg-primary);
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    font-family: var(--font-mono);
+                    font-size: 14px;
+                    font-weight: 600;
+                    z-index: 10002;
+                    animation: fadeIn 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => {
+                    notification.style.animation = 'fadeOut 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }, 2000);
+            }
+        }
+
+        // Initialize
+        const presentation = new SlidePresentation();
+        const editor = new InlineEditor();
+    </script>
+</body>
+</html>
