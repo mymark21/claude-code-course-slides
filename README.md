@@ -47,7 +47,7 @@
 ## 📝 源文件
 
 - 内容大纲：[claude_code_slides.md](claude_code_slides.md)
-- 演示文稿：[claude-code-course.html](claude-code-course.html)
+- 演示文稿：[index.html](index.html)
 
 ## 🌐 在线访问
 
