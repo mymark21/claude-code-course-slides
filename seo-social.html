@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Code 协助 SEO 和社媒</title>
+
+    <!-- Fonts: Noto Serif SC + Cormorant Garamond + Source Serif 4 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — Paper & Ink / Wabi-Sabi
+           =========================================== */
+        :root {
+            --bg-cream: #faf9f7;
+            --bg-paper: #f5f3ee;
+            --text-primary: #1a1a1a;
+            --text-secondary: #555;
+            --text-tertiary: #888;
+            --accent-crimson: #c41e3a;
+            --accent-warm: #d4a574;
+            --accent-sage: #8b9d83;
+            --border-light: #e8e4df;
+            --border-medium: #d4cfc7;
+
+            --font-display: 'Noto Serif SC', 'Cormorant Garamond', serif;
+            --font-body: 'Source Serif 4', serif;
+
+            --title-size: clamp(2rem, 6vw, 4.5rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.6rem);
+            --h3-size: clamp(1rem, 2.5vw, 1.7rem);
+            --body-size: clamp(0.82rem, 1.4vw, 1.08rem);
+            --small-size: clamp(0.72rem, 1.1vw, 0.92rem);
+
+            --slide-padding: clamp(2rem, 5vw, 5rem);
+            --content-gap: clamp(1rem, 2.2vw, 2.2rem);
+            --element-gap: clamp(0.5rem, 1vw, 1rem);
+
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        /* === VIEWPORT BASE === */
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-cream);
+            color: var(--text-primary);
+            line-height: 1.75;
+            font-feature-settings: "liga" 1, "calt" 1;
+        }
+
+        /* Paper texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            width: 100%; height: 100%;
+            background-image: repeating-linear-gradient(
+                0deg, transparent, transparent 2px,
+                rgba(0,0,0,0.008) 2px, rgba(0,0,0,0.008) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.4;
+        }
+
+        /* === SLIDE BASE === */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+        }
+
+        /* Corner ornaments on every slide */
+        .slide::before, .slide::after {
+            content: '';
+            position: absolute;
+            width: clamp(36px, 4.5vw, 70px);
+            height: clamp(36px, 4.5vw, 70px);
+            border: 1px solid var(--border-medium);
+            pointer-events: none;
+            opacity: 0.45;
+        }
+        .slide::before { top: var(--slide-padding); left: var(--slide-padding); border-right: none; border-bottom: none; }
+        .slide::after  { bottom: var(--slide-padding); right: var(--slide-padding); border-left: none; border-top: none; }
+
+        /* === SLIDE CONTENT WRAPPER === */
+        .slide-content {
+            max-width: min(88vw, 940px);
+            max-height: 86vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Decorative red line accent */
+        .slide-content::before {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--element-gap));
+            left: 0;
+            width: clamp(36px, 7vw, 72px);
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-crimson), transparent);
+            opacity: 0.6;
+        }
+        .slide-content::after {
+            content: '';
+            position: absolute;
+            top: calc(-1 * var(--element-gap) - 3px);
+            left: clamp(40px, 7.5vw, 77px);
+            width: 8px; height: 8px;
+            border: 1px solid var(--accent-crimson);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        /* === TYPOGRAPHY === */
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--element-gap);
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--element-gap);
+            line-height: 1.3;
+            letter-spacing: -0.01em;
+            padding-top: var(--element-gap);
+        }
+        h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 600;
+            color: var(--accent-crimson);
+            margin-bottom: calc(var(--element-gap) * 0.7);
+            line-height: 1.4;
+        }
+        p, li { font-size: var(--body-size); color: var(--text-primary); line-height: 1.75; }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: var(--h3-size);
+            font-style: italic;
+            margin-bottom: var(--content-gap);
+            font-weight: 400;
+        }
+        .section-label {
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            margin-bottom: var(--content-gap);
+            padding-bottom: calc(var(--element-gap) * 0.5);
+            border-bottom: 1px solid var(--border-light);
+            display: inline-block;
+            font-family: var(--font-body);
+        }
+
+        /* === LISTS === */
+        ul { list-style: none; display: flex; flex-direction: column; gap: var(--element-gap); }
+        ul li { padding-left: 1.8em; position: relative; }
+        ul li::before { content: '—'; position: absolute; left: 0; color: var(--accent-crimson); font-weight: 400; }
+        ul ul { margin-top: calc(var(--element-gap) * 0.4); gap: calc(var(--element-gap) * 0.65); }
+        ul ul li { font-size: calc(var(--body-size) * 0.95); color: var(--text-secondary); }
+        ul ul li::before { content: '·'; color: var(--accent-warm); }
+
+        /* === GRID === */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+            gap: var(--content-gap);
+            margin-top: var(--content-gap);
+        }
+        .grid-item {
+            background: var(--bg-paper);
+            padding: clamp(1rem, 2vw, 1.8rem);
+            border: 1px solid var(--border-medium);
+            position: relative;
+        }
+        .grid-item::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 12px; height: 12px;
+            border-top: 2px solid var(--accent-crimson);
+            border-left: 2px solid var(--accent-crimson);
+        }
+
+        /* === BADGE === */
+        .badge {
+            display: inline-block;
+            padding: clamp(0.2rem, 0.6vw, 0.4rem) clamp(0.6rem, 1.4vw, 1rem);
+            background: transparent;
+            border: 1.5px solid var(--accent-sage);
+            color: var(--accent-sage);
+            font-size: var(--small-size);
+            font-weight: 600;
+            margin: 0.15rem;
+            font-family: var(--font-body);
+            letter-spacing: 0.02em;
+        }
+        .badge.red { border-color: var(--accent-crimson); color: var(--accent-crimson); }
+        .badge.warm { border-color: var(--accent-warm); color: var(--accent-warm); }
+
+        /* === CODE === */
+        code {
+            background: var(--bg-paper);
+            padding: 0.15em 0.5em;
+            border-radius: 3px;
+            color: var(--accent-crimson);
+            font-size: 0.88em;
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            border: 1px solid var(--border-light);
+        }
+
+        /* === QUOTE BLOCK === */
+        .quote-block {
+            border-left: 3px solid var(--accent-crimson);
+            padding: clamp(0.8rem, 1.5vw, 1.4rem) clamp(1rem, 2vw, 1.8rem);
+            background: var(--bg-paper);
+            margin-top: var(--content-gap);
+            font-style: italic;
+            color: var(--text-secondary);
+            font-size: calc(var(--body-size) * 1.05);
+        }
+
+        /* === TITLE SLIDE === */
+        .title-slide {
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--bg-paper) 100%);
+        }
+        .title-slide .slide-content {
+            text-align: center;
+            border: 2px solid var(--border-medium);
+            padding: clamp(2rem, 5vw, 4rem);
+            background: var(--bg-cream);
+            box-shadow: 0 0 0 8px var(--bg-cream), 0 0 0 9px var(--border-light);
+        }
+        .title-slide .slide-content::before,
+        .title-slide .slide-content::after { display: none; }
+
+        /* === NUMBERS ROW === */
+        .numbers-row {
+            display: flex;
+            gap: var(--content-gap);
+            margin-top: var(--content-gap);
+            flex-wrap: wrap;
+        }
+        .number-card {
+            flex: 1;
+            min-width: clamp(80px, 18vw, 160px);
+            background: var(--bg-paper);
+            border: 1px solid var(--border-medium);
+            padding: clamp(0.8rem, 1.5vw, 1.4rem);
+            text-align: center;
+            position: relative;
+        }
+        .number-card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--accent-crimson);
+            border-left: 2px solid var(--accent-crimson);
+        }
+        .number-card .num {
+            font-family: var(--font-display);
+            font-size: clamp(1.4rem, 3.5vw, 2.8rem);
+            font-weight: 700;
+            color: var(--accent-crimson);
+            line-height: 1;
+        }
+        .number-card .label {
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            margin-top: 0.3em;
+        }
+
+        /* === THREE LAYER DIAGRAM === */
+        .layer-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: var(--content-gap);
+        }
+        .layer {
+            padding: clamp(0.7rem, 1.3vw, 1.1rem) clamp(1rem, 2vw, 1.8rem);
+            border: 1px solid var(--border-medium);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: clamp(0.8rem, 1.5vw, 1.4rem);
+        }
+        .layer + .layer { border-top: none; }
+        .layer-num {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            font-weight: 700;
+            color: var(--border-medium);
+            min-width: 2rem;
+            line-height: 1;
+        }
+        .layer.active { background: var(--bg-paper); }
+        .layer.active .layer-num { color: var(--accent-crimson); }
+        .layer-title {
+            font-family: var(--font-display);
+            font-size: calc(var(--body-size) * 1.05);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .layer-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-top: 0.2em;
+        }
+
+        /* === FLOWCHART (pure CSS) === */
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+            margin-top: var(--content-gap);
+            max-height: 62vh;
+            overflow: hidden;
+        }
+        .flow-row {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        .flow-node {
+            background: var(--bg-paper);
+            border: 1px solid var(--border-medium);
+            padding: clamp(0.35rem, 0.7vw, 0.6rem) clamp(0.7rem, 1.4vw, 1.2rem);
+            font-size: var(--small-size);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            position: relative;
+            min-width: clamp(80px, 16vw, 160px);
+            text-align: center;
+        }
+        .flow-node.highlight {
+            border-color: var(--accent-crimson);
+            background: #fff7f7;
+        }
+        .flow-node.highlight::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 8px; height: 8px;
+            border-top: 2px solid var(--accent-crimson);
+            border-left: 2px solid var(--accent-crimson);
+        }
+        .flow-arrow-v {
+            width: 2px;
+            background: var(--border-medium);
+            min-height: 18px;
+            margin: 0 0 0 clamp(40px, 8vw, 80px);
+            position: relative;
+        }
+        .flow-arrow-v::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top: 5px solid var(--border-medium);
+        }
+        .flow-label {
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            padding: 0 0 0 clamp(0.5rem, 1vw, 1rem);
+            display: flex;
+            align-items: center;
+        }
+
+        /* Horizontal flowchart for multi-branch */
+        .flowchart-h {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 0;
+            margin-top: var(--content-gap);
+            overflow: hidden;
+            max-height: 60vh;
+        }
+        .flow-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+        .flow-arrow-h {
+            display: flex;
+            align-items: center;
+            min-width: clamp(12px, 2.5vw, 28px);
+        }
+        .flow-arrow-h::before {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+            background: var(--border-medium);
+        }
+
+        /* === STEP LIST (alternative to flowchart) === */
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin-top: var(--content-gap);
+        }
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(0.8rem, 1.5vw, 1.4rem);
+            padding: clamp(0.5rem, 1vw, 0.9rem) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .step-item:last-child { border-bottom: none; }
+        .step-num {
+            font-family: var(--font-display);
+            font-size: clamp(1.1rem, 2.2vw, 1.8rem);
+            font-weight: 700;
+            color: var(--accent-crimson);
+            min-width: clamp(1.6rem, 3.2vw, 2.6rem);
+            line-height: 1;
+            padding-top: 0.15em;
+            opacity: 0.5;
+        }
+        .step-body {}
+        .step-title {
+            font-family: var(--font-display);
+            font-size: calc(var(--body-size) * 1.05);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .step-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            margin-top: 0.2em;
+            line-height: 1.5;
+        }
+
+        /* === HORIZONTAL TAG ROW === */
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.4rem, 0.8vw, 0.8rem);
+            margin-top: var(--content-gap);
+        }
+        .tag {
+            padding: clamp(0.25rem, 0.5vw, 0.45rem) clamp(0.7rem, 1.3vw, 1.2rem);
+            border: 1px solid var(--border-medium);
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            font-family: var(--font-body);
+            background: var(--bg-paper);
+        }
+
+        /* === PRINCIPLE CARD (for "不妥协") === */
+        .principle-item {
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(0.8rem, 1.5vw, 1.4rem);
+            padding: clamp(0.7rem, 1.3vw, 1.2rem) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .principle-item:last-child { border-bottom: none; }
+        .principle-mark {
+            font-size: var(--body-size);
+            font-family: var(--font-display);
+            font-weight: 700;
+            color: var(--accent-crimson);
+            min-width: 1.6rem;
+        }
+        .principle-text { font-size: var(--body-size); color: var(--text-primary); line-height: 1.6; }
+        .principle-sub { font-size: var(--small-size); color: var(--text-secondary); margin-top: 0.2em; }
+
+        /* === ANIMATIONS === */
+        .reveal {
+            opacity: 0;
+            transform: translateY(14px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .reveal:nth-child(1) { transition-delay: 0.08s; }
+        .reveal:nth-child(2) { transition-delay: 0.16s; }
+        .reveal:nth-child(3) { transition-delay: 0.24s; }
+        .reveal:nth-child(4) { transition-delay: 0.32s; }
+        .reveal:nth-child(5) { transition-delay: 0.40s; }
+        .reveal:nth-child(6) { transition-delay: 0.48s; }
+        .reveal:nth-child(7) { transition-delay: 0.56s; }
+        .reveal:nth-child(8) { transition-delay: 0.64s; }
+
+        /* === NAVIGATION === */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 2px;
+            background: var(--accent-crimson);
+            width: 0%; z-index: 10000;
+            transition: width 0.3s ease;
+        }
+        .nav-dots {
+            position: fixed;
+            right: clamp(1.2rem, 3vw, 2.4rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 12px;
+            z-index: 1000;
+        }
+        .nav-dot {
+            width: 6px; height: 6px;
+            border: 1px solid var(--border-medium);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.4s var(--ease-out-expo);
+        }
+        .nav-dot.active { background: var(--accent-crimson); border-color: var(--accent-crimson); transform: scale(1.5); }
+        .nav-dot:hover { background: var(--accent-warm); border-color: var(--accent-warm); }
+
+        /* === KEYBOARD HINT === */
+        .kbd-hint {
+            position: fixed;
+            bottom: clamp(1.2rem, 3vw, 2rem);
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            letter-spacing: 0.08em;
+            z-index: 100;
+            font-family: var(--font-body);
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* === SLIDE NUMBER === */
+        .slide-num {
+            position: absolute;
+            bottom: var(--slide-padding);
+            left: var(--slide-padding);
+            font-size: var(--small-size);
+            color: var(--text-tertiary);
+            font-family: var(--font-body);
+            letter-spacing: 0.06em;
+        }
+
+        /* === RESPONSIVE BREAKPOINTS === */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(1.2rem, 3vw, 2.2rem);
+                --content-gap: clamp(0.7rem, 1.5vw, 1.4rem);
+                --title-size: clamp(1.6rem, 4.5vw, 2.8rem);
+                --h2-size: clamp(1.2rem, 3vw, 1.9rem);
+                --body-size: clamp(0.72rem, 1.3vw, 0.96rem);
+            }
+            .slide::before, .slide::after { width: 28px; height: 28px; }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.8rem, 2.5vw, 1.5rem);
+                --title-size: clamp(1.3rem, 4vw, 2.2rem);
+                --body-size: clamp(0.65rem, 1.1vw, 0.88rem);
+            }
+            .nav-dots, .slide::before, .slide::after { display: none; }
+        }
+        @media (max-width: 600px) {
+            .grid { grid-template-columns: 1fr; }
+            .flowchart-h { flex-direction: column; }
+            .numbers-row { gap: clamp(0.4rem, 0.8vw, 0.8rem); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Progress bar -->
+    <div class="progress-bar"></div>
+
+    <!-- Navigation dots -->
+    <nav class="nav-dots"></nav>
+
+    <!-- Keyboard hint -->
+    <div class="kbd-hint">↑ ↓ 导航 · Space 下一页</div>
+
+    <!-- ==========================================
+         SLIDES
+         ========================================== -->
+
+    <!-- Slide 1: TITLE -->
+    <section class="slide title-slide">
+        <div class="slide-content">
+            <div class="section-label reveal">Claude Code 实战系列</div>
+            <h1 class="reveal">协助 SEO<br>与社媒运营</h1>
+            <p class="subtitle reveal">从内容生产到平台执行，AI 如何接管工作流</p>
+            <div class="tag-row reveal" style="justify-content: center; margin-top: 1.2rem;">
+                <span class="tag">SEO 工作流</span>
+                <span class="tag">LinkedIn</span>
+                <span class="tag">Twitter 自动化</span>
+                <span class="tag">Skill 沉淀</span>
+            </div>
+        </div>
+        <div class="slide-num">01 / 18</div>
+    </section>
+
+    <!-- Slide 2: 结论 — Claude Code 超出"写代码"的范围 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">一 · 先说结论</div>
+            <h2 class="reveal">Claude Code 早已超出<br>「写代码」的边界</h2>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">不是 code assistant，而是<strong>完备的本地智能体</strong></li>
+                <li class="reveal">Code 不再是目的，而是<strong>手段</strong>；code 变成了一种元能力</li>
+                <li class="reveal">AI 从聊天窗口「走出来」，进入真实工作环境</li>
+                <li class="reveal">不再只是提供建议，而是<strong>逐步接管中间过程，实际行动</strong></li>
+            </ul>
+            <div class="quote-block reveal">
+                它是让 AI 真正进入业务、接管流程、开始执行工作的入口。
+            </div>
+        </div>
+        <div class="slide-num">02 / 18</div>
+    </section>
+
+    <!-- Slide 3: 为什么是 Claude Code (1-3) -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">二 · 为什么是 Claude Code</div>
+            <h2 class="reveal">五个理由（上）</h2>
+            <div class="step-list" style="margin-top: var(--content-gap);">
+                <div class="step-item reveal">
+                    <div class="step-num">01</div>
+                    <div class="step-body">
+                        <div class="step-title">模型能力足够强</div>
+                        <div class="step-desc">Agent 的上限受限于模型的理解力、规划力与长链路稳定性</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">02</div>
+                    <div class="step-body">
+                        <div class="step-title">Agent 客户端足够成熟</div>
+                        <div class="step-desc">不只模型强，还有足够好的交互与编排层——能拆开、串起来、执行下去</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">03</div>
+                    <div class="step-body">
+                        <div class="step-title">稳定使用 Agent 的唯一解之一</div>
+                        <div class="step-desc">真正能做到稳定、连续、可复用地跑工作流——不是 demo，是能上手干活的</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-num">03 / 18</div>
+    </section>
+
+    <!-- Slide 4: 为什么是 Claude Code (4-5) -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">二 · 为什么是 Claude Code</div>
+            <h2 class="reveal">五个理由（下）</h2>
+            <div class="step-list" style="margin-top: var(--content-gap);">
+                <div class="step-item reveal">
+                    <div class="step-num">04</div>
+                    <div class="step-body">
+                        <div class="step-title">市场反馈高度一致</div>
+                        <div class="step-desc">硅谷技术圈与简中推特早期使用者：真正用明白之后，工作方式发生了变化</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">05</div>
+                    <div class="step-body">
+                        <div class="step-title">门槛高 → 先手优势</div>
+                        <div class="step-desc">安装门槛、网络门槛、账号门槛——这些基本都有标准答案，而高门槛形成隔绝效应</div>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-block reveal">
+                在中文环境下，只要你比别人先一步真正把它用起来，你就已经有先手优势了。
+            </div>
+        </div>
+        <div class="slide-num">04 / 18</div>
+    </section>
+
+    <!-- Slide 5: Claude Code 能做什么 — 三个层次 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">四 · Claude Code 能做什么</div>
+            <h2 class="reveal">三个执行层次</h2>
+            <div class="layer-diagram reveal" style="margin-top: var(--content-gap);">
+                <div class="layer">
+                    <div class="layer-num">①</div>
+                    <div>
+                        <div class="layer-title">自然语言交互层</div>
+                        <div class="layer-desc">理解意图、规划方案、生成内容、给出建议——最熟悉的一层</div>
+                    </div>
+                </div>
+                <div class="layer active">
+                    <div class="layer-num">②</div>
+                    <div>
+                        <div class="layer-title">代码层 ← 关键</div>
+                        <div class="layer-desc">接管代码实现：把「我要实现一个工作流」翻译成脚本、调用、串联、执行逻辑</div>
+                    </div>
+                </div>
+                <div class="layer">
+                    <div class="layer-num">③</div>
+                    <div>
+                        <div class="layer-title">实际工作环境执行层</div>
+                        <div class="layer-desc">回邮件 · 分析热点 · 发帖 · 抓取内容 · 整理数据 · 跑社媒运营流程</div>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                Claude Code 接管了中间的代码层，于是整个工作流终于被真正打通了。
+            </div>
+        </div>
+        <div class="slide-num">05 / 18</div>
+    </section>
+
+    <!-- Slide 6: Case 1 — SEO 工作流介绍 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">五 · 案例一</div>
+            <h2 class="reveal">SEO 文章工作流</h2>
+            <p class="reveal" style="margin-top: var(--element-gap); color: var(--text-secondary); font-style: italic;">
+                不是「输入关键词 → 生成文章」，而是模拟一个有研究能力的内容团队
+            </p>
+            <div class="numbers-row reveal" style="margin-top: var(--content-gap);">
+                <div class="number-card">
+                    <div class="num">6</div>
+                    <div class="label">轮搜索</div>
+                </div>
+                <div class="number-card">
+                    <div class="num">~60</div>
+                    <div class="label">条 SERP 结果</div>
+                </div>
+                <div class="number-card">
+                    <div class="num">5</div>
+                    <div class="label">并发进程</div>
+                </div>
+                <div class="number-card">
+                    <div class="num">25k</div>
+                    <div class="label">词研究素材</div>
+                </div>
+            </div>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">每个研究问题：最多 10 个 URL，正文 &gt; 300词，单页截取 ≤ 1700词</li>
+                <li class="reveal">单问题累计约 5000 词即停止，5 个问题 = 约 25000 词素材</li>
+            </ul>
+        </div>
+        <div class="slide-num">06 / 18</div>
+    </section>
+
+    <!-- Slide 7: Case 1 — SEO 流程图 -->
+    <section class="slide">
+        <div class="slide-content" style="max-width: min(95vw, 980px);">
+            <div class="section-label reveal">五 · 案例一 · 流程图</div>
+            <h2 class="reveal" style="margin-bottom: var(--content-gap);">SEO 工作流全链路</h2>
+            <!-- Flowchart: snake layout — row 1 left→right, row 2 right→left -->
+            <div class="reveal" style="margin-top: var(--content-gap); overflow: hidden;">
+
+                <!-- ROW 1: 节点 1→4，从左到右 -->
+                <div style="display:flex; align-items:stretch;">
+
+                    <!-- Node 1 -->
+                    <div class="flow-node highlight" style="flex:1;">输入关键词</div>
+                    <!-- Arrow → -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 2 -->
+                    <div class="flow-node" style="flex:1.3;">主题搜索 ×1<br><span style="font-size:0.82em;color:var(--text-tertiary);">约 10 条 SERP</span></div>
+                    <!-- Arrow → -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 3 -->
+                    <div class="flow-node" style="flex:1.2;">生成 SEO 大纲</div>
+                    <!-- Arrow → -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 4 -->
+                    <div class="flow-node highlight" style="flex:1.4;">拆解 5 个<br>研究问题</div>
+
+                </div>
+
+                <!-- TURN: 右侧竖线向下 -->
+                <div style="display:flex;justify-content:flex-end;">
+                    <div style="width:2px;height:clamp(14px,2.5vh,28px);background:var(--border-medium);position:relative;margin-right:calc(var(--flex-end-offset, 0px));">
+                        <div style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top:5px solid var(--border-medium);"></div>
+                    </div>
+                </div>
+
+                <!-- ROW 2: 节点 5→8，从右到左（flex-direction: row-reverse） -->
+                <div style="display:flex; align-items:stretch; flex-direction:row-reverse;">
+
+                    <!-- Node 8 (最右 = 终点，视觉上在右) -->
+                    <div class="flow-node highlight" style="flex:1.3;">生成最终<br>SEO 文章</div>
+                    <!-- Arrow ← -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 7 -->
+                    <div class="flow-node" style="flex:1.4;">汇总 ~25000 词<br><span style="font-size:0.82em;color:var(--text-tertiary);">每问题 ~5000 词</span></div>
+                    <!-- Arrow ← -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 6 -->
+                    <div class="flow-node" style="flex:1.3;">抓取 &amp; 清洗<br><span style="font-size:0.82em;color:var(--text-tertiary);">5 进程并发</span></div>
+                    <!-- Arrow ← -->
+                    <div style="display:flex;align-items:center;padding:0 4px;">
+                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
+                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
+                        </div>
+                    </div>
+                    <!-- Node 5 -->
+                    <div class="flow-node" style="flex:1.4;">二次搜索 ×5<br><span style="font-size:0.82em;color:var(--text-tertiary);">约 50 条 SERP</span></div>
+
+                </div>
+
+                <!-- Bottom note row -->
+                <div style="display:flex;gap:var(--element-gap);margin-top:var(--element-gap);flex-wrap:wrap;">
+                    <div style="font-size:var(--small-size);color:var(--text-tertiary);padding:clamp(0.3rem,0.6vw,0.6rem) clamp(0.6rem,1.2vw,1rem);border:1px solid var(--border-light);background:var(--bg-paper);">
+                        <span style="color:var(--accent-crimson);font-weight:600;">1 轮</span> 主题搜索 · 理解内容生态
+                    </div>
+                    <div style="font-size:var(--small-size);color:var(--text-tertiary);padding:clamp(0.3rem,0.6vw,0.6rem) clamp(0.6rem,1.2vw,1rem);border:1px solid var(--border-light);background:var(--bg-paper);">
+                        <span style="color:var(--accent-crimson);font-weight:600;">5 轮</span> 问题搜索 · 分别追踪子问题
+                    </div>
+                    <div style="font-size:var(--small-size);color:var(--text-tertiary);padding:clamp(0.3rem,0.6vw,0.6rem) clamp(0.6rem,1.2vw,1rem);border:1px solid var(--border-light);background:var(--bg-paper);">
+                        过滤：正文 &gt; 300词 · 单页 ≤ 1700词
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="slide-num">07 / 18</div>
+    </section>
+
+    <!-- Slide 8: Case 2 — LinkedIn Post 介绍 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">五 · 案例二</div>
+            <h2 class="reveal">LinkedIn Post 生成</h2>
+            <p class="reveal" style="margin-top: var(--element-gap); color: var(--text-secondary); font-style: italic;">
+                本质不是「写帖子」，而是<strong style="color: var(--text-primary);">风格迁移</strong>问题——在事实边界内，学习平台语言规则
+            </p>
+            <div class="grid reveal" style="grid-template-columns: 1fr 1fr; margin-top: var(--content-gap);">
+                <div class="grid-item">
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">从 Tool Page 提取</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary);">功能 · 能力 · 平台支持 · 指标 · 定价<br>→ 可验证的事实信息</p>
+                </div>
+                <div class="grid-item">
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">从竞品分析写法</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary);">语气 · 结构 · Hook · CTA · Hashtag<br>→ 只借表达方式，不复用数据</p>
+                </div>
+            </div>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">生成多条风格和长度<strong>不同</strong>的 post（差异化输出）</li>
+                <li class="reveal">品牌词 <code>#wayinvideo</code> 必须作为首个 hashtag</li>
+                <li class="reveal">事实检查 + 重复表达检查 → 输出至 <code>output/linkedin-post-{topic}-{timestamp}.md</code></li>
+            </ul>
+        </div>
+        <div class="slide-num">08 / 18</div>
+    </section>
+
+    <!-- Slide 9: Case 2 — LinkedIn Post 流程图 -->
+    <section class="slide">
+        <div class="slide-content" style="max-width: min(95vw, 980px);">
+            <div class="section-label reveal">五 · 案例二 · 流程图</div>
+            <h2 class="reveal" style="margin-bottom: var(--content-gap);">LinkedIn Post 工作流</h2>
+            <div style="display: flex; align-items: flex-start; gap: clamp(0.3rem, 0.8vw, 1rem); overflow: hidden; max-height: 60vh;" class="reveal">
+                <!-- Step boxes in a horizontal row with arrows -->
+                <div class="flow-node" style="flex:1; min-width:0; font-size: var(--small-size);">输入<br><code style="font-size:0.8em;">topic</code><br><code style="font-size:0.8em;">count</code><br><code style="font-size:0.8em;">angles</code></div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
+                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">查 Tool Page<br><span style="color:var(--text-tertiary);">事实信息</span></div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
+                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">读竞品文案<br><span style="color:var(--text-tertiary);">分析写法</span></div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
+                <div class="flow-node highlight" style="flex:1.4; min-width:0; font-size: var(--small-size);">生成多条<br>差异化 Posts</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
+                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">CTA &amp;<br>#wayinvideo</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
+                <div class="flow-node highlight" style="flex:1.2; min-width:0; font-size: var(--small-size);">事实校验<br>→ 输出 .md</div>
+            </div>
+            <div style="margin-top: var(--content-gap); display: grid; grid-template-columns: 1fr 1fr; gap: var(--element-gap);" class="reveal">
+                <div style="background: var(--bg-paper); border: 1px solid var(--border-light); padding: clamp(0.6rem, 1.2vw, 1rem);">
+                    <div style="font-size: var(--small-size); color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;">解决的问题</div>
+                    <div style="font-size: var(--small-size); color: var(--text-secondary); margin-top: 0.4em; line-height: 1.6;">AI 能否在不同平台里，学会平台表达规则，并在事实边界内做风格迁移</div>
+                </div>
+                <div style="background: var(--bg-paper); border: 1px solid var(--border-light); padding: clamp(0.6rem, 1.2vw, 1rem);">
+                    <div style="font-size: var(--small-size); color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;">输出路径</div>
+                    <div style="font-size: var(--small-size); color: var(--accent-crimson); margin-top: 0.4em; font-family: monospace;">output/linkedin-post-<br>{topic}-{timestamp}.md</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-num">09 / 18</div>
+    </section>
+
+    <!-- Slide 10: Case 3 — Twitter 自动运营介绍 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">五 · 案例三</div>
+            <h2 class="reveal">Twitter 自动运营</h2>
+            <p class="reveal" style="margin-top: var(--element-gap); color: var(--text-secondary); font-style: italic;">
+                不只是「内容生成」——进入了真实的平台交互和动作执行
+            </p>
+            <div class="step-list" style="margin-top: var(--content-gap);">
+                <div class="step-item reveal">
+                    <div class="step-num">①</div>
+                    <div class="step-body">
+                        <div class="step-title">启动 Chrome CDP 9222，连接 agent-browser</div>
+                        <div class="step-desc">强制刷新首页时间线（旧内容 → 互动质量下降）</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">②</div>
+                    <div class="step-body">
+                        <div class="step-title">滚动采集 + 过滤广告 → 收集 3 个有效 URL</div>
+                        <div class="step-desc">至少滚动 2 次，确认 URL 列表</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">③</div>
+                    <div class="step-body">
+                        <div class="step-title">逐条处理：打开 → 分析 → 生成回复 → 发送</div>
+                        <div class="step-desc">回复简洁 1–2 句，匹配原帖语气；发送后关闭 Tab，循环继续</div>
+                    </div>
+                </div>
+            </div>
+            <div class="tag-row reveal" style="margin-top: var(--content-gap);">
+                <span class="tag">观察上下文</span>
+                <span class="tag">分析平台语境</span>
+                <span class="tag">执行动作</span>
+                <span class="tag">循环处理任务</span>
+            </div>
+        </div>
+        <div class="slide-num">10 / 18</div>
+    </section>
+
+    <!-- Slide 11: Case 3 — Twitter 流程图 -->
+    <section class="slide">
+        <div class="slide-content" style="max-width: min(95vw, 980px);">
+            <div class="section-label reveal">五 · 案例三 · 流程图</div>
+            <h2 class="reveal" style="margin-bottom: var(--content-gap);">Twitter 自动运营流程</h2>
+            <div style="display:flex; align-items:flex-start; gap: clamp(0.2rem, 0.6vw, 0.8rem); overflow: hidden; max-height: 58vh;" class="reveal">
+                <div class="flow-node highlight" style="flex:1;min-width:0;font-size:var(--small-size);">启动<br>Chrome CDP<br>agent-browser</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node" style="flex:1.1;min-width:0;font-size:var(--small-size);">Step 0<br>刷新首页<br>时间线</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node" style="flex:1.3;min-width:0;font-size:var(--small-size);">Step 1<br>滚动 ×2<br>过滤广告<br>收集 3 URL</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node" style="flex:1;min-width:0;font-size:var(--small-size);">Step 2<br>确认<br>URL 列表</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node highlight" style="flex:1.2;min-width:0;font-size:var(--small-size);">Step 3<br>打开 URL<br>新 Tab</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node" style="flex:1.2;min-width:0;font-size:var(--small-size);">Step 4-5<br>分析风格<br>生成回复</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node" style="flex:1;min-width:0;font-size:var(--small-size);">Step 6<br>发送回复<br>关闭 Tab</div>
+                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
+                <div class="flow-node highlight" style="flex:1;min-width:0;font-size:var(--small-size);">还有帖子？<br>↩ 循环<br>否则结束</div>
+            </div>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                Agent 已经非常接近一个<strong>可操作的社媒执行代理</strong>了。
+            </div>
+        </div>
+        <div class="slide-num">11 / 18</div>
+    </section>
+
+    <!-- Slide 12: 我还实现过什么 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">六 · 更多实践</div>
+            <h2 class="reveal">我还实现过什么</h2>
+            <div class="tag-row reveal" style="margin-top: var(--content-gap);">
+                <span class="tag">Medium 自动养号</span>
+                <span class="tag">YouTube VOC 分析</span>
+                <span class="tag">KOL 数据批量抓取</span>
+                <span class="tag">Landing page 文案优化</span>
+                <span class="tag">文章配图自动化</span>
+                <span class="tag">生成演讲 PPT</span>
+                <span class="tag">Pinterest / Reddit 养号</span>
+                <span class="tag">视频脚本工作流</span>
+            </div>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                只要一项工作你重复做过 3 次以上，<br>它基本就值得被拆解成工作流。
+            </div>
+            <p class="reveal" style="margin-top: var(--element-gap); color: var(--text-secondary); font-size: var(--small-size);">
+                很多人总觉得「这个事情还没复杂到值得自动化」，结果永远停留在手工做事。<br>
+                只要重复做过三次，你就已经拥有了把它抽象成 SOP 的基础。
+            </p>
+        </div>
+        <div class="slide-num">12 / 18</div>
+    </section>
+
+    <!-- Slide 13: 核心 — 业务逻辑能力 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">七 · 真正的核心</div>
+            <h2 class="reveal">从代码能力 → 业务逻辑能力</h2>
+            <div class="grid reveal" style="grid-template-columns: 1fr 1fr; margin-top: var(--content-gap);">
+                <div class="grid-item" style="border-color: var(--border-light);">
+                    <h3 style="font-size: var(--small-size); color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">过去</h3>
+                    <p style="font-size: var(--body-size);">做自动化的重点<br>是<strong>会不会写代码</strong></p>
+                </div>
+                <div class="grid-item">
+                    <h3 style="font-size: var(--small-size); color: var(--accent-crimson); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">现在</h3>
+                    <p style="font-size: var(--body-size);">重点变成：<br><strong>你能不能把业务逻辑拆清楚</strong></p>
+                </div>
+            </div>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">Agent 不怕复杂，它怕的是<strong>模糊</strong></li>
+                <li class="reveal">很多「只能人工完成」的工作，拆细之后有大量稳定、重复、可判断的步骤</li>
+                <li class="reveal">真正的护城河：你对自己工作流的<strong>理解深度</strong></li>
+            </ul>
+            <div class="quote-block reveal">
+                未来的竞争力，不只是「谁会用 AI」，而是谁更擅长把工作拆成可执行的业务单元。
+            </div>
+        </div>
+        <div class="slide-num">13 / 18</div>
+    </section>
+
+    <!-- Slide 14: 注意点 — 可迁移 + 可调 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">八 · 重要注意点</div>
+            <h2 class="reveal">可迁移 · 可调整</h2>
+            <div class="grid reveal" style="grid-template-columns: 1fr 1fr; margin-top: var(--content-gap);">
+                <div class="grid-item">
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">可迁移性极强</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary); line-height: 1.6;">
+                        Twitter 可以养号 → Pinterest / Reddit / Quora 同理<br><br>
+                        文章工作流成立 → 视频脚本工作流也成立<br><br>
+                        底层逻辑相通：发现 → 研究 → 产出 → 互动 → 建立分发
+                    </p>
+                </div>
+                <div class="grid-item">
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">可调性极高</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary); line-height: 1.6;">
+                        可以调：语气 · 行业 · 执行方式<br>
+                        平台格式 · 受众偏好 · 表达风格<br><br>
+                        工作流不是死板脚本，<br>更像一套<strong style="color:var(--text-primary);">可调参数的业务系统</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="slide-num">14 / 18</div>
+    </section>
+
+    <!-- Slide 15: Skill — 经验沉淀为能力 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">九 · Skill 系统</div>
+            <h2 class="reveal">经验如何沉淀为能力</h2>
+            <div class="step-list" style="margin-top: var(--content-gap);">
+                <div class="step-item reveal">
+                    <div class="step-num">①</div>
+                    <div class="step-body">
+                        <div class="step-title">先搜有没有现成 Skill</div>
+                        <div class="step-desc">下载视频、视频转文字、格式转换、数据清洗……很多已有人做好了</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">②</div>
+                    <div class="step-body">
+                        <div class="step-title">Skill 可以组合、可以编排</div>
+                        <div class="step-desc">当 Skill 可以被调用、复用、串联，工作流就像一个模块化系统</div>
+                    </div>
+                </div>
+                <div class="step-item reveal">
+                    <div class="step-num">③</div>
+                    <div class="step-body">
+                        <div class="step-title">所有经验都可以沉淀成 Skill</div>
+                        <div class="step-desc">经验 → 结构 → Skill → 反复调用</div>
+                    </div>
+                </div>
+            </div>
+            <div class="quote-block reveal">
+                所有做过 3 次以上的动作，都值得考虑 Skill 化。<br>
+                重复意味着有模式；有模式就值得被抽象。
+            </div>
+        </div>
+        <div class="slide-num">15 / 18</div>
+    </section>
+
+    <!-- Slide 16: 我的原则 — 不妥协 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">十 · 我的原则</div>
+            <h2 class="reveal">不妥协</h2>
+            <div style="margin-top: var(--content-gap);">
+                <div class="principle-item reveal">
+                    <div class="principle-mark">×</div>
+                    <div>
+                        <div class="principle-text">不使用 Claude Code 平替</div>
+                        <div class="principle-sub">「找个差不多的替代品」看似省钱，实际上是在浪费时间</div>
+                    </div>
+                </div>
+                <div class="principle-item reveal">
+                    <div class="principle-mark">×</div>
+                    <div>
+                        <div class="principle-text">不使用国产模型替代</div>
+                        <div class="principle-sub">不是情绪判断，是效率判断——核心能力、稳定性、长链路执行明显不够，就是在消耗生命时间</div>
+                    </div>
+                </div>
+                <div class="principle-item reveal">
+                    <div class="principle-mark">→</div>
+                    <div>
+                        <div class="principle-text">任何一点犹豫，都是对时间的浪费</div>
+                        <div class="principle-sub">你犹豫的不是工具本身，而是在犹豫要不要更早进入下一代工作方式</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-num">16 / 18</div>
+    </section>
+
+    <!-- Slide 17: Token Maxing -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">十一 · 关键概念</div>
+            <h2 class="reveal">Token Maxing</h2>
+            <div class="numbers-row reveal" style="margin-top: var(--content-gap);">
+                <div class="number-card">
+                    <div class="num" style="font-size: clamp(1rem, 2.5vw, 1.8rem);">¥800–1500</div>
+                    <div class="label">Claude Max 月费</div>
+                </div>
+                <div class="number-card">
+                    <div class="num" style="font-size: clamp(1rem, 2.5vw, 1.8rem);">$250k</div>
+                    <div class="label">未来员工 Token 配额/年</div>
+                </div>
+            </div>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">额度已买 → 应该在额度内把 token 用尽，否则是浪费</li>
+                <li class="reveal">把 token 当「<strong>生产资料</strong>」而不是「聊天消耗品」</li>
+                <li class="reveal">未来：Token 配额会像服务器预算、广告预算一样，成为企业基础资源</li>
+            </ul>
+            <div class="quote-block reveal">
+                如果 token 不再是限制，你最先想交给 agent 的任务是什么？<br>
+                当生成与执行能力被释放，你会把注意力放到哪里？
+            </div>
+        </div>
+        <div class="slide-num">17 / 18</div>
+    </section>
+
+    <!-- Slide 18: 结尾 -->
+    <section class="slide title-slide">
+        <div class="slide-content" style="max-width: min(90vw, 860px);">
+            <!-- Two-column layout: text left, QR right -->
+            <div style="display: flex; align-items: center; gap: clamp(2rem, 5vw, 5rem);">
+
+                <!-- Left: text -->
+                <div style="flex: 1; text-align: left;">
+                    <div class="section-label reveal">结语</div>
+                    <h2 class="reveal" style="font-size: var(--h2-size); padding-top: var(--element-gap); line-height: 1.3;">
+                        AGI 已经非常温柔地<br>到来了
+                    </h2>
+                    <p class="reveal" style="margin-top: var(--element-gap); font-size: var(--body-size); color: var(--text-secondary); line-height: 1.7;">
+                        在内容问题逐渐被解决之后，<br>我们接下来要建设什么、<br>放大什么、重新定义什么
+                    </p>
+                    <div class="tag-row reveal" style="margin-top: var(--content-gap);">
+                        <span class="tag">Claude Code</span>
+                        <span class="tag">Agent 工作流</span>
+                        <span class="tag">SEO 与社媒自动化</span>
+                    </div>
+                </div>
+
+                <!-- Right: QR code — focal point -->
+                <div class="reveal" style="flex: none; display: flex; flex-direction: column; align-items: center; gap: 0.8em;">
+                    <div style="padding: clamp(8px, 1.2vw, 14px); border: 1.5px solid var(--border-medium); background: #fff; box-shadow: 0 0 0 6px var(--bg-cream), 0 0 0 7px var(--border-light);">
+                        <img src="https://res.cloudinary.com/duhum2cve/image/upload/v1774673587/2026/03/8bed34f800f06b399afd2caeab1b04a4.jpg"
+                             alt="公众号二维码"
+                             style="display: block; width: clamp(120px, 18vw, 200px); height: clamp(120px, 18vw, 200px); object-fit: contain;">
+                    </div>
+                    <span style="font-size: var(--small-size); color: var(--text-tertiary); letter-spacing: 0.1em; text-transform: uppercase;">扫码关注公众号</span>
+                </div>
+
+            </div>
+        </div>
+        <div class="slide-num">18 / 18</div>
+    </section>
+
+    <!-- ==========================================
+         JAVASCRIPT
+         ========================================== -->
+    <script>
+        /* === SLIDE OBSERVER & NAV === */
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.querySelector('.nav-dots');
+        const progressBar = document.querySelector('.progress-bar');
+        const totalSlides = slides.length;
+
+        // Build nav dots
+        slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot';
+            dot.setAttribute('aria-label', `Slide ${i + 1}`);
+            dot.addEventListener('click', () => {
+                slides[i].scrollIntoView({ behavior: 'smooth' });
+            });
+            navDots.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.nav-dot');
+
+        // IntersectionObserver for visibility and animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    const idx = Array.from(slides).indexOf(entry.target);
+                    // Update dots
+                    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+                    // Update progress bar
+                    progressBar.style.width = `${((idx + 1) / totalSlides) * 100}%`;
+                }
+            });
+        }, { threshold: 0.5 });
+
+        slides.forEach(s => observer.observe(s));
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const current = Array.from(slides).findIndex(s => s.classList.contains('visible'));
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                const next = Math.min(current + 1, totalSlides - 1);
+                slides[next].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                const prev = Math.max(current - 1, 0);
+                slides[prev].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    </script>
+
+</body>
+</html>
