@@ -1228,46 +1228,65 @@
         const progressBar = document.querySelector('.progress-bar');
         const totalSlides = slides.length;
 
+        // Single source of truth for current index
+        let currentIndex = 0;
+        let isScrolling = false;
+
         // Build nav dots
         slides.forEach((_, i) => {
             const dot = document.createElement('button');
             dot.className = 'nav-dot';
             dot.setAttribute('aria-label', `Slide ${i + 1}`);
-            dot.addEventListener('click', () => {
-                slides[i].scrollIntoView({ behavior: 'smooth' });
-            });
+            dot.addEventListener('click', () => goTo(i));
             navDots.appendChild(dot);
         });
 
         const dots = document.querySelectorAll('.nav-dot');
 
-        // IntersectionObserver for visibility and animations
+        function updateUI(idx) {
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+            progressBar.style.width = `${((idx + 1) / totalSlides) * 100}%`;
+        }
+
+        function goTo(idx) {
+            idx = Math.max(0, Math.min(idx, totalSlides - 1));
+            if (idx === currentIndex && isScrolling) return;
+            currentIndex = idx;
+            isScrolling = true;
+            updateUI(idx);
+            slides[idx].scrollIntoView({ behavior: 'smooth' });
+            // Unlock after animation settles (~600ms)
+            setTimeout(() => { isScrolling = false; }, 600);
+        }
+
+        // IntersectionObserver — only for triggering reveal animations
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
+                    // Sync currentIndex if user scrolled manually
                     const idx = Array.from(slides).indexOf(entry.target);
-                    // Update dots
-                    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
-                    // Update progress bar
-                    progressBar.style.width = `${((idx + 1) / totalSlides) * 100}%`;
+                    if (idx !== currentIndex) {
+                        currentIndex = idx;
+                        updateUI(idx);
+                    }
                 }
             });
-        }, { threshold: 0.5 });
+        }, { threshold: 0.6 });
 
         slides.forEach(s => observer.observe(s));
 
-        // Keyboard navigation
+        // Initialize first slide
+        updateUI(0);
+
+        // Keyboard navigation — throttled
         document.addEventListener('keydown', (e) => {
-            const current = Array.from(slides).findIndex(s => s.classList.contains('visible'));
             if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
                 e.preventDefault();
-                const next = Math.min(current + 1, totalSlides - 1);
-                slides[next].scrollIntoView({ behavior: 'smooth' });
+                if (!isScrolling) goTo(currentIndex + 1);
             } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
                 e.preventDefault();
-                const prev = Math.max(current - 1, 0);
-                slides[prev].scrollIntoView({ behavior: 'smooth' });
+                if (!isScrolling) goTo(currentIndex - 1);
             }
         });
     </script>
