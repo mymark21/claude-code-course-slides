@@ -9,6 +9,35 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Serif+SC:wght@400;600;700&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'base', themeVariables: { primaryColor: '#f5f0eb', primaryBorderColor: '#c8b8a2', lineColor: '#9e8e7e', fontSize: '13px', edgeLabelBackground: '#faf8f5' } });
+        // 渲染完成后：宽度撑满容器，高度动态约束不超出可用空间
+        window.addEventListener('load', () => {
+            document.querySelectorAll('.slide .mermaid svg').forEach(svg => {
+                const container = svg.closest('.slide-content');
+                if (!container) return;
+
+                // 强制宽度 100%
+                svg.style.maxWidth = '100%';
+                svg.style.width = '100%';
+
+                // 计算 mermaid 容器可用高度：
+                // slide-content max-height(86vh) 减去其他兄弟元素已占用的高度
+                const mermaidEl = svg.closest('.mermaid') || svg.parentElement;
+                const siblings = Array.from(container.children).filter(el => el !== mermaidEl && !el.classList.contains('mermaid'));
+                const siblingHeight = siblings.reduce((sum, el) => sum + el.getBoundingClientRect().height, 0);
+                const contentGap = parseFloat(getComputedStyle(container).getPropertyValue('--content-gap') || '32');
+                const maxH = window.innerHeight * 0.86;
+                const available = maxH - siblingHeight - contentGap * 2;
+
+                if (available > 60) {
+                    svg.style.maxHeight = available + 'px';
+                    svg.style.height = 'auto';
+                }
+            });
+        });
+    </script>
 
     <style>
         /* ===========================================
@@ -100,7 +129,8 @@
 
         /* === SLIDE CONTENT WRAPPER === */
         .slide-content {
-            max-width: min(88vw, 940px);
+            width: 100%;
+            max-width: min(95vw, 980px);
             max-height: 86vh;
             overflow: hidden;
             position: relative;
@@ -425,6 +455,19 @@
         }
 
         /* === STEP LIST (alternative to flowchart) === */
+
+        /* === MERMAID: 流程图宽度始终等于页面最大宽度 === */
+        .slide .mermaid {
+            display: block;
+            width: 100%;
+        }
+        .slide .mermaid svg {
+            display: block;
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            max-height: 55vh; /* 兜底：最高不超过视口55%，剩余空间留给标题和注释 */
+        }
         .step-list {
             display: flex;
             flex-direction: column;
@@ -619,8 +662,8 @@
     <section class="slide title-slide">
         <div class="slide-content">
             <div class="section-label reveal">Claude Code 实战系列</div>
-            <h1 class="reveal">协助 SEO<br>与社媒运营</h1>
-            <p class="subtitle reveal">从内容生产到平台执行，AI 如何接管工作流</p>
+            <p class="subtitle reveal">AGI 的奇点已经温柔地越过了</p>
+            <h1 class="reveal">Claude Code，我所瞥见的一种新的生活方式</h1>
             <div class="tag-row reveal" style="justify-content: center; margin-top: 1.2rem;">
                 <span class="tag">SEO 工作流</span>
                 <span class="tag">LinkedIn</span>
@@ -780,81 +823,32 @@
 
     <!-- Slide 7: Case 1 — SEO 流程图 -->
     <section class="slide">
-        <div class="slide-content" style="max-width: min(95vw, 980px);">
+            <div class="slide-content">
             <div class="section-label reveal">五 · 案例一 · 流程图</div>
             <h2 class="reveal" style="margin-bottom: var(--content-gap);">SEO 工作流全链路</h2>
-            <!-- Flowchart: snake layout — row 1 left→right, row 2 right→left -->
-            <div class="reveal" style="margin-top: var(--content-gap); overflow: hidden;">
+            <!-- Flowchart: Mermaid -->
+            <div class="reveal" style="margin-top: var(--content-gap);">
+                <div class="mermaid" style="background:transparent; font-family: var(--font-body);">
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f5f0eb','primaryBorderColor':'#c8b8a2','lineColor':'#9e8e7e','fontSize':'13px','edgeLabelBackground':'#faf8f5','tertiaryColor':'#fff7f7'}}}%%
+flowchart LR
+    A["输入关键词"] --> B["主题搜索 ×1\n约 10 条 SERP"]
+    B --> C["生成 SEO 大纲"]
+    C --> D["拆解 5 个\n研究问题"]
+    D --> Q1["问题 1\n搜索 · 抓取 · 清洗"]
+    D --> Q2["问题 2\n搜索 · 抓取 · 清洗"]
+    D --> Q3["问题 3\n搜索 · 抓取 · 清洗"]
+    D --> Q4["问题 4\n搜索 · 抓取 · 清洗"]
+    D --> Q5["问题 5\n搜索 · 抓取 · 清洗"]
+    Q1 --> G["汇总\n~25000 词"]
+    Q2 --> G
+    Q3 --> G
+    Q4 --> G
+    Q5 --> G
+    G --> H["生成最终\nSEO 文章"]
 
-                <!-- ROW 1: 节点 1→4，从左到右 -->
-                <div style="display:flex; align-items:stretch;">
-
-                    <!-- Node 1 -->
-                    <div class="flow-node highlight" style="flex:1;">输入关键词</div>
-                    <!-- Arrow → -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 2 -->
-                    <div class="flow-node" style="flex:1.3;">主题搜索 ×1<br><span style="font-size:0.82em;color:var(--text-tertiary);">约 10 条 SERP</span></div>
-                    <!-- Arrow → -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 3 -->
-                    <div class="flow-node" style="flex:1.2;">生成 SEO 大纲</div>
-                    <!-- Arrow → -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;right:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-left:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 4 -->
-                    <div class="flow-node highlight" style="flex:1.4;">拆解 5 个<br>研究问题</div>
-
-                </div>
-
-                <!-- TURN: 右侧竖线向下 -->
-                <div style="display:flex;justify-content:flex-end;">
-                    <div style="width:2px;height:clamp(14px,2.5vh,28px);background:var(--border-medium);position:relative;margin-right:calc(var(--flex-end-offset, 0px));">
-                        <div style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);border:4px solid transparent;border-top:5px solid var(--border-medium);"></div>
-                    </div>
-                </div>
-
-                <!-- ROW 2: 节点 5→8，从右到左（flex-direction: row-reverse） -->
-                <div style="display:flex; align-items:stretch; flex-direction:row-reverse;">
-
-                    <!-- Node 8 (最右 = 终点，视觉上在右) -->
-                    <div class="flow-node highlight" style="flex:1.3;">生成最终<br>SEO 文章</div>
-                    <!-- Arrow ← -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 7 -->
-                    <div class="flow-node" style="flex:1.4;">汇总 ~25000 词<br><span style="font-size:0.82em;color:var(--text-tertiary);">每问题 ~5000 词</span></div>
-                    <!-- Arrow ← -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 6 -->
-                    <div class="flow-node" style="flex:1.3;">抓取 &amp; 清洗<br><span style="font-size:0.82em;color:var(--text-tertiary);">5 进程并发</span></div>
-                    <!-- Arrow ← -->
-                    <div style="display:flex;align-items:center;padding:0 4px;">
-                        <div style="height:2px;width:clamp(10px,2vw,24px);background:var(--border-medium);position:relative;">
-                            <div style="position:absolute;left:-4px;top:50%;transform:translateY(-50%);border:4px solid transparent;border-right:5px solid var(--border-medium);"></div>
-                        </div>
-                    </div>
-                    <!-- Node 5 -->
-                    <div class="flow-node" style="flex:1.4;">二次搜索 ×5<br><span style="font-size:0.82em;color:var(--text-tertiary);">约 50 条 SERP</span></div>
-
+    style A fill:#fff7f7,stroke:#c0392b,color:#333
+    style D fill:#fff7f7,stroke:#c0392b,color:#333
+    style H fill:#fff7f7,stroke:#c0392b,color:#333
                 </div>
 
                 <!-- Bottom note row -->
@@ -904,22 +898,22 @@
 
     <!-- Slide 9: Case 2 — LinkedIn Post 流程图 -->
     <section class="slide">
-        <div class="slide-content" style="max-width: min(95vw, 980px);">
+        <div class="slide-content">
             <div class="section-label reveal">五 · 案例二 · 流程图</div>
             <h2 class="reveal" style="margin-bottom: var(--content-gap);">LinkedIn Post 工作流</h2>
-            <div style="display: flex; align-items: flex-start; gap: clamp(0.3rem, 0.8vw, 1rem); overflow: hidden; max-height: 60vh;" class="reveal">
-                <!-- Step boxes in a horizontal row with arrows -->
-                <div class="flow-node" style="flex:1; min-width:0; font-size: var(--small-size);">输入<br><code style="font-size:0.8em;">topic</code><br><code style="font-size:0.8em;">count</code><br><code style="font-size:0.8em;">angles</code></div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
-                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">查 Tool Page<br><span style="color:var(--text-tertiary);">事实信息</span></div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
-                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">读竞品文案<br><span style="color:var(--text-tertiary);">分析写法</span></div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
-                <div class="flow-node highlight" style="flex:1.4; min-width:0; font-size: var(--small-size);">生成多条<br>差异化 Posts</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
-                <div class="flow-node" style="flex:1.2; min-width:0; font-size: var(--small-size);">CTA &amp;<br>#YourBrand</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;padding-top:1rem;">→</div>
-                <div class="flow-node highlight" style="flex:1.2; min-width:0; font-size: var(--small-size);">事实校验<br>→ 输出 .md</div>
+            <div class="mermaid reveal" style="background:transparent;">
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f5f0eb','primaryBorderColor':'#c8b8a2','lineColor':'#9e8e7e','fontSize':'13px','edgeLabelBackground':'#faf8f5'}}}%%
+flowchart LR
+    A["输入\ntopic · count · angles"] --> B["查 Tool Page\n事实信息"]
+    A --> C["读竞品文案\n分析写法"]
+    B --> D["生成多条\n差异化 Posts"]
+    C --> D
+    D --> E["加入 CTA\n#YourBrand"]
+    E --> F["事实校验\n→ 输出 .md"]
+
+    style A fill:#fff7f7,stroke:#c0392b,color:#333
+    style D fill:#fff7f7,stroke:#c0392b,color:#333
+    style F fill:#fff7f7,stroke:#c0392b,color:#333
             </div>
             <div style="margin-top: var(--content-gap); display: grid; grid-template-columns: 1fr 1fr; gap: var(--element-gap);" class="reveal">
                 <div style="background: var(--bg-paper); border: 1px solid var(--border-light); padding: clamp(0.6rem, 1.2vw, 1rem);">
@@ -978,25 +972,29 @@
 
     <!-- Slide 11: Case 3 — Twitter 流程图 -->
     <section class="slide">
-        <div class="slide-content" style="max-width: min(95vw, 980px);">
+        <div class="slide-content">
             <div class="section-label reveal">五 · 案例三 · 流程图</div>
             <h2 class="reveal" style="margin-bottom: var(--content-gap);">Twitter 自动运营流程</h2>
-            <div style="display:flex; align-items:flex-start; gap: clamp(0.2rem, 0.6vw, 0.8rem); overflow: hidden; max-height: 58vh;" class="reveal">
-                <div class="flow-node highlight" style="flex:1;min-width:0;font-size:var(--small-size);">启动<br>Chrome CDP<br>agent-browser</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node" style="flex:1.1;min-width:0;font-size:var(--small-size);">Step 0<br>刷新首页<br>时间线</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node" style="flex:1.3;min-width:0;font-size:var(--small-size);">Step 1<br>滚动 ×2<br>过滤广告<br>收集 3 URL</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node" style="flex:1;min-width:0;font-size:var(--small-size);">Step 2<br>确认<br>URL 列表</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node highlight" style="flex:1.2;min-width:0;font-size:var(--small-size);">Step 3<br>打开 URL<br>新 Tab</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node" style="flex:1.2;min-width:0;font-size:var(--small-size);">Step 4-5<br>分析风格<br>生成回复</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node" style="flex:1;min-width:0;font-size:var(--small-size);">Step 6<br>发送回复<br>关闭 Tab</div>
-                <div style="display:flex;align-items:center;color:var(--border-medium);font-size:1.2rem;">→</div>
-                <div class="flow-node highlight" style="flex:1;min-width:0;font-size:var(--small-size);">还有帖子？<br>↩ 循环<br>否则结束</div>
+            <div class="mermaid reveal" style="background:transparent;">
+%%{init: {'theme': 'base', 'themeVariables': {'primaryColor':'#f5f0eb','primaryBorderColor':'#c8b8a2','lineColor':'#9e8e7e','fontSize':'13px','edgeLabelBackground':'#faf8f5'}}}%%
+flowchart LR
+    subgraph top[" "]
+        direction LR
+        A["启动 Chrome CDP\nagent-browser"] --> B["刷新首页\n时间线"]
+        B --> C["滚动 ×2\n过滤广告 · 收集 3 URL"]
+        C --> D["确认\nURL 列表"]
+    end
+    subgraph bottom[" "]
+        direction LR
+        E["打开 URL\n新 Tab"] --> F["分析风格\n生成回复"]
+        F --> G["发送回复\n关闭 Tab"]
+        G --> H["判断是否继续\n↩ 循环 or 结束"]
+    end
+    D --> E
+
+    style A fill:#fff7f7,stroke:#c0392b,color:#333
+    style E fill:#fff7f7,stroke:#c0392b,color:#333
+    style H fill:#fff7f7,stroke:#c0392b,color:#333
             </div>
             <div class="quote-block reveal" style="margin-top: var(--content-gap);">
                 Agent 已经非常接近一个<strong>可操作的社媒执行代理</strong>了。
@@ -1028,10 +1026,90 @@
                 只要重复做过三次，你就已经拥有了把它抽象成 SOP 的基础。
             </p>
         </div>
-        <div class="slide-num">12 / 18</div>
+        <div class="slide-num">12 / 20</div>
     </section>
 
-    <!-- Slide 13: 核心 — 业务逻辑能力 -->
+    <!-- Slide 13: 浏览器接管 = 最后一公里 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">七 · 一个观察</div>
+            <h2 class="reveal">Agent 接管浏览器<br>是自动化工作流的最后一公里</h2>
+            <div class="grid reveal" style="grid-template-columns: 1fr 1fr; margin-top: var(--content-gap);">
+                <div class="grid-item">
+                    <h3 style="font-size: var(--small-size); color: var(--accent-crimson); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">数据问题</h3>
+                    <p style="font-size: var(--body-size); line-height: 1.7;">大多数软件面向人类设计，<br>没有对外提供 API。<br>浏览器让 Agent 看到<br>人眼能看到的一切。</p>
+                </div>
+                <div class="grid-item">
+                    <h3 style="font-size: var(--small-size); color: var(--accent-crimson); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">执行问题</h3>
+                    <p style="font-size: var(--body-size); line-height: 1.7;">自动化到最后，<br>越来越需要真实操作：<br>点赞、打开 Tab、找下拉菜单、<br>完成精细的界面动作。</p>
+                </div>
+            </div>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                所见即所得——跟人没什么区别，<br>这是它克服各种障碍的方式。
+            </div>
+        </div>
+        <div class="slide-num">13 / 20</div>
+    </section>
+
+    <!-- Slide 14: 软件生态与 Agent 友好 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">七 · 一个观察 · 续</div>
+            <h2 class="reveal">这是一个阶段性的解法</h2>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">飞书 CLI 已在推动<strong>面向 Agent 的软件规范</strong>，但这是少数派</li>
+                <li class="reveal">绝大多数软件的交互规范仍面向人类，<strong>没有暴露 API</strong>，对接难度极高</li>
+                <li class="reveal">在 API 生态成熟之前，浏览器接管是最实用的过渡方案——<strong>有界面就能操作</strong></li>
+                <li class="reveal">本质上接近 RPA，但加入了 AI 判断：Agent 能读懂页面语义，而不只是坐标点击</li>
+            </ul>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                它目前能看到的障碍，是阶段性的。<br>软件生态迟早会往 Agent 友好的方向走。
+            </div>
+        </div>
+        <div class="slide-num">14 / 22</div>
+    </section>
+
+    <!-- Slide 15: 人与 Agent 的协作模型 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">八 · 一个趋势</div>
+            <h2 class="reveal">人与 Agent 的边界<br>正在被主动模糊</h2>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal">很多平台在积极做<strong>反爬虫与反自动化</strong>，纯 Agent 信号越来越容易被识别</li>
+                <li class="reveal">新的协作方式：人操作打底，Agent 接管重复与决策部分，再回归人工——<strong>混合信号</strong></li>
+                <li class="reveal">人的真实点击、真实点赞与 Agent 的操作数据混杂在一起，<strong>没有人能界定这是否违规</strong></li>
+                <li class="reveal">我养 Reddit、Medium、Twitter 时就是这个逻辑：<strong>我也真实操作，但我不会把两者分开</strong></li>
+            </ul>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                不是「人」或「机器」，而是<strong>人机混合的执行体</strong>。
+            </div>
+        </div>
+        <div class="slide-num">15 / 22</div>
+    </section>
+
+    <!-- Slide 16: 这将成为标准协作范式 -->
+    <section class="slide">
+        <div class="slide-content">
+            <div class="section-label reveal">八 · 一个趋势 · 续</div>
+            <h2 class="reveal">半年内将成为<br>标准化的协作范式</h2>
+            <div class="grid reveal" style="grid-template-columns: 1fr 1fr; margin-top: var(--content-gap);">
+                <div class="grid-item">
+                    <h3 style="font-size: var(--small-size); color: var(--text-tertiary); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">为什么可行</h3>
+                    <p style="font-size: var(--body-size); line-height: 1.7;">混合信号在技术上<br>难以区分。<br>人机协同不是欺骗，<br>是工具的延伸。</p>
+                </div>
+                <div class="grid-item">
+                    <h3 style="font-size: var(--small-size); color: var(--accent-crimson); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;">为什么持久</h3>
+                    <p style="font-size: var(--body-size); line-height: 1.7;">平台反自动化会越来越强，<br>而人机边界模糊<br>是绕过这道墙<br>最自然的方式。</p>
+                </div>
+            </div>
+            <div class="quote-block reveal" style="margin-top: var(--content-gap);">
+                这种协作方式没有标准答案，<br>但它将在相当长的时间内持续存在。
+            </div>
+        </div>
+        <div class="slide-num">16 / 22</div>
+    </section>
+
+    <!-- Slide 17: 核心 — 业务逻辑能力 -->
     <section class="slide">
         <div class="slide-content">
             <div class="section-label reveal">七 · 真正的核心</div>
@@ -1055,7 +1133,7 @@
                 未来的竞争力，不只是「谁会用 AI」，而是谁更擅长把工作拆成可执行的业务单元。
             </div>
         </div>
-        <div class="slide-num">13 / 18</div>
+        <div class="slide-num">17 / 22</div>
     </section>
 
     <!-- Slide 14: 注意点 — 可迁移 + 可调 -->
@@ -1082,7 +1160,7 @@
                 </div>
             </div>
         </div>
-        <div class="slide-num">14 / 18</div>
+        <div class="slide-num">18 / 22</div>
     </section>
 
     <!-- Slide 15: Skill — 经验沉淀为能力 -->
@@ -1118,7 +1196,7 @@
                 重复意味着有模式；有模式就值得被抽象。
             </div>
         </div>
-        <div class="slide-num">15 / 18</div>
+        <div class="slide-num">19 / 22</div>
     </section>
 
     <!-- Slide 16: 我的原则 — 不妥协 -->
@@ -1150,7 +1228,7 @@
                 </div>
             </div>
         </div>
-        <div class="slide-num">16 / 18</div>
+        <div class="slide-num">20 / 22</div>
     </section>
 
     <!-- Slide 17: Token Maxing -->
@@ -1178,7 +1256,7 @@
                 当生成与执行能力被释放，你会把注意力放到哪里？
             </div>
         </div>
-        <div class="slide-num">17 / 18</div>
+        <div class="slide-num">21 / 22</div>
     </section>
 
     <!-- Slide 18: 结尾 -->
@@ -1215,7 +1293,7 @@
 
             </div>
         </div>
-        <div class="slide-num">18 / 18</div>
+        <div class="slide-num">22 / 22</div>
     </section>
 
     <!-- ==========================================
@@ -1255,6 +1333,7 @@
             isScrolling = true;
             updateUI(idx);
             slides[idx].scrollIntoView({ behavior: 'smooth' });
+            localStorage.setItem('seo-slide-index', idx);
             // Unlock after animation settles (~600ms)
             setTimeout(() => { isScrolling = false; }, 600);
         }
@@ -1269,6 +1348,7 @@
                     if (idx !== currentIndex) {
                         currentIndex = idx;
                         updateUI(idx);
+                        localStorage.setItem('seo-slide-index', idx);
                     }
                 }
             });
@@ -1276,8 +1356,14 @@
 
         slides.forEach(s => observer.observe(s));
 
-        // Initialize first slide
-        updateUI(0);
+        // Initialize: restore last position or start at 0
+        const savedIndex = parseInt(localStorage.getItem('seo-slide-index') || '0', 10);
+        if (savedIndex > 0) {
+            updateUI(savedIndex);
+            setTimeout(() => goTo(savedIndex), 100);
+        } else {
+            updateUI(0);
+        }
 
         // Keyboard navigation — throttled
         document.addEventListener('keydown', (e) => {
