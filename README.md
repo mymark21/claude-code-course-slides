@@ -7,8 +7,7 @@
 | 页面 | 文件 | 说明 |
 |---|---|---|
 | [目录页](index.html) | `index.html` | 课程目录，链接到各 slide deck |
-| [Claude Code 课程](claude-code-course.html) | `claude-code-course.html` | 基础 → 心法 → 进阶 → Demo，23 页 |
-| [实操训练营](bootcamp.html) | `bootcamp.html` | Claude Code 实操训练营 Day 1，30 页 |
+| [实操训练营](bootcamp.html) | `bootcamp.html` | Claude Code 实操训练营，30 页 |
 | [Agent 驱动工作流](agent-workflows.html) | `agent-workflows.html` | SEO / LinkedIn / Twitter 工作流演讲，17 页 |
 
 ## 设计特点

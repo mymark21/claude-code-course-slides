@@ -624,10 +624,11 @@
         <div class="slide-content">
             <h2 class="reveal">认识模型</h2>
             <ul>
-                <li class="reveal">当前可用模型一览（Sonnet / Opus / Haiku）</li>
+                <li class="reveal">当前可用模型一览（Fable / Opus / Sonnet / Haiku）</li>
                 <li class="reveal">切换命令：<code>/model</code></li>
                 <li class="reveal">选择原则：
                     <ul>
+                        <li><span class="badge">Fable</span> 最强性能，短暂放出后被官方收回，寄希望于官方重新放出</li>
                         <li><span class="badge">Opus</span> 复杂任务</li>
                         <li><span class="badge">Sonnet</span> 日常使用</li>
                         <li><span class="badge">Haiku</span> 省钱快速</li>
@@ -647,13 +648,13 @@
                     <p style="font-size: var(--small-size); color: var(--text-secondary);">只分析、不动手 → 先看 Claude 的思路再决定是否执行</p>
                 </div>
                 <div class="grid-item reveal">
-                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">Build 模式</h3>
-                    <p style="font-size: var(--small-size); color: var(--text-secondary);">直接执行 → Claude 自主完成任务</p>
+                    <h3 style="font-size: var(--body-size); margin-bottom: 0.5rem;">Coding 模式</h3>
+                    <p style="font-size: var(--small-size); color: var(--text-secondary);">Agent 开始写代码、解决实际问题</p>
                 </div>
             </div>
             <ul style="margin-top: var(--content-gap);">
                 <li class="reveal">原则：复杂/高风险任务先 Plan，确认没问题再 Build</li>
-                <li class="reveal">类比：Plan = 看设计图，Build = 开始施工</li>
+                <li class="reveal">类比：Plan = 看设计图，Coding = Agent 上手干活</li>
             </ul>
         </div>
     </section>
@@ -697,23 +698,6 @@
         </div>
     </section>
 
-    <!-- Slide 8: 费用感知 -->
-    <section class="slide">
-        <div class="slide-content">
-            <h2 class="reveal">费用感知</h2>
-            <ul>
-                <li class="reveal">查看用量：<code>/cost</code></li>
-                <li class="reveal">Token 消耗来源：输入 / 输出 / 工具调用</li>
-                <li class="reveal">节省技巧：
-                    <ul>
-                        <li>压缩对话</li>
-                        <li>精准 prompt</li>
-                        <li>避免重复上传大文件</li>
-                    </ul>
-                </li>
-            </ul>
-        </div>
-    </section>
 
     <!-- Slide 9: 第一条 Prompt 怎么写 -->
     <section class="slide">
@@ -740,23 +724,6 @@
         </div>
     </section>
 
-    <!-- Slide 11: 如何 Review 输出 -->
-    <section class="slide">
-        <div class="slide-content">
-            <h2 class="reveal">如何 Review 输出</h2>
-            <ul>
-                <li class="reveal">不要盲目 Accept</li>
-                <li class="reveal">检查清单：
-                    <ul>
-                        <li>逻辑对吗？</li>
-                        <li>副作用？</li>
-                        <li>有没有删了不该删的？</li>
-                    </ul>
-                </li>
-                <li class="reveal">养成习惯：<code>git diff</code> 看每一次变更</li>
-            </ul>
-        </div>
-    </section>
 
     <!-- Slide 12: 更好的终端：Ghostty -->
     <section class="slide">
@@ -767,18 +734,6 @@
                 <li class="reveal">为什么换：性能、字体渲染、原生 macOS 体验</li>
                 <li class="reveal">核心技巧：<strong>拖动文件夹</strong> → 自动 <code>cd</code> 到该目录</li>
                 <li class="reveal">配置推荐：字体 / 透明度 / 快捷键</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- Slide 13: 自举：让 Claude 改自己 -->
-    <section class="slide">
-        <div class="slide-content">
-            <h2 class="reveal">自举：让 Claude 改自己</h2>
-            <ul>
-                <li class="reveal">概念：用 Claude Code 修改 Claude Code 的配置和脚本</li>
-                <li class="reveal">场景：自动生成 CLAUDE.md、优化自己的 workflow</li>
-                <li class="reveal">Wow moment：Claude 给自己写工具</li>
             </ul>
         </div>
     </section>
@@ -799,9 +754,9 @@
     <!-- Slide 15: Agent 蜂群模式 -->
     <section class="slide">
         <div class="slide-content">
-            <h2 class="reveal">Agent 蜂群模式</h2>
+            <h2 class="reveal">Agent Team 蜂群模式</h2>
             <ul>
-                <li class="reveal">概念：一个主 agent → 派发多个 sub-agent 并行工作</li>
+                <li class="reveal">概念：一个主 agent → 派发多个 sub-agent 组成 team，并行工作</li>
                 <li class="reveal">场景举例：同时爬数据 + 写文章 + 生成图片描述</li>
                 <li class="reveal">关键：任务拆解要清晰，子任务相互独立</li>
             </ul>
@@ -821,38 +776,27 @@
         </div>
     </section>
 
-    <!-- Slide 17: MCP：让 Claude 连接世界 -->
+    <!-- Slide 16: MCP：让 Claude 连接世界 -->
     <section class="slide">
         <div class="slide-content">
             <h2 class="reveal">MCP：让 Claude 连接世界</h2>
             <ul>
                 <li class="reveal">MCP = Model Context Protocol</li>
                 <li class="reveal">类比：给 Claude 装插件</li>
-                <li class="reveal">重点介绍 3 个：
+                <li class="reveal">重点介绍 4 个：
                     <ul>
-                        <li><span class="badge">browser</span> 操控浏览器</li>
-                        <li><span class="badge">filesystem</span> 读写本地文件</li>
-                        <li><span class="badge">github</span> 仓库操作</li>
+                        <li><span class="badge">WordPress MCP</span> 操控 WordPress 网站</li>
+                        <li><span class="badge">Shopify MCP</span> 操控 Shopify 店铺</li>
+                        <li><span class="badge">卖家精灵 MCP</span> 查亚马逊商品数据，挖掘爆款</li>
+                        <li><span class="badge">Ahrefs MCP</span> SEO 查词分析</li>
                     </ul>
                 </li>
-                <li class="reveal">配置方式：<code>claude_desktop_config.json</code></li>
+                <li class="reveal">配置方式：查到相关文档，把文档直接丢给 Claude Code 自己去处理，人不要手动操作</li>
             </ul>
         </div>
     </section>
 
-    <!-- Slide 18: Agent 完备：渐进式披露 -->
-    <section class="slide">
-        <div class="slide-content">
-            <h2 class="reveal">Agent 完备：渐进式披露</h2>
-            <ul>
-                <li class="reveal">概念：Claude 自己配置自己的工具链</li>
-                <li class="reveal">流程：需求 → Claude 分析 → 推荐 MCP → 自动写配置</li>
-                <li class="reveal"><code>cc</code> 配置其他工具的 demo</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- Slide 19: Demo 1：创建网站 -->
+    <!-- Slide 17: Demo 1：创建网站 -->
     <section class="slide">
         <div class="slide-content">
             <div class="section-label reveal">🟩 PART 4: Demo</div>
@@ -895,7 +839,7 @@
             <h2 class="reveal">Demo 4：RPA 自动化浏览器</h2>
             <ul>
                 <li class="reveal">场景：批量表单填写 / 数据采集 / 定时操作</li>
-                <li class="reveal">依赖：browser MCP（Playwright/Puppeteer）</li>
+                <li class="reveal">依赖：TT Bridge（browser use / Playwright）</li>
                 <li class="reveal">展示：Claude 写脚本 → 自动执行 → 返回结果</li>
             </ul>
         </div>

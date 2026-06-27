@@ -25,17 +25,18 @@
 
 ### Slide 3 — 认识模型
 
-- 当前可用模型一览（Sonnet / Opus / Haiku）
+- 当前可用模型一览（Fable / Opus / Sonnet / Haiku）
 - 切换命令：`/model`
-- 选择原则：复杂任务用 Opus，日常用 Sonnet，省钱用 Haiku
+- 选择原则：最强性能 Fable（短暂放出后被官方收回，寄希望于重新放出），复杂任务用 Opus，日常用 Sonnet，省钱用 Haiku
 
 ---
 
 ### Slide 4 — 两种模式
 
-- **交互模式**：实时对话，适合探索
-- **命令模式**：`claude -p "..."` 一次性执行，适合脚本/自动化
-- 使用场景对比表
+- **Plan 模式**：只分析、不动手，先看 Claude 的思路再决定是否执行
+- **Coding 模式**：Agent 开始写代码、解决实际问题
+- 原则：复杂/高风险任务先 Plan，确认没问题再 Coding
+- 类比：Plan = 看设计图，Coding = Agent 上手干活
 
 ---
 
@@ -66,14 +67,6 @@
 
 ---
 
-### Slide 8 — 费用感知
-
-- 查看用量：`/cost`
-- Token 消耗来源：输入 / 输出 / 工具调用
-- 节省技巧：压缩对话、精准 prompt、避免重复上传大文件
-
----
-
 ## 🟧 PART 2：工作流心法
 
 ---
@@ -94,14 +87,6 @@
 
 ---
 
-### Slide 11 — 如何 Review 输出
-
-- 不要盲目 Accept
-- 检查清单：逻辑对吗？副作用？有没有删了不该删的？
-- 养成习惯：`git diff` 看每一次变更
-
----
-
 ## 🟥 PART 3：进阶
 
 ---
@@ -114,15 +99,7 @@
 
 ---
 
-### Slide 13 — 自举：让 Claude 改自己
-
-- 概念：用 Claude Code 修改 Claude Code 的配置和脚本
-- 场景：自动生成 CLAUDE.md、优化自己的 workflow
-- Wow moment：Claude 给自己写工具
-
----
-
-### Slide 14 — 快捷键 & Permission 模式
+### Slide 12 — 快捷键 & Permission 模式
 
 - `cc` 别名 = 快速启动
 - Permission pass 状态：跳过每次操作确认
@@ -131,9 +108,9 @@
 
 ---
 
-### Slide 15 — Agent 蜂群模式
+### Slide 13 — Agent Team 蜂群模式
 
-- 概念：一个主 agent → 派发多个 sub-agent 并行工作
+- 概念：一个主 agent → 派发多个 sub-agent 组成 team，并行工作
 - 场景举例：同时爬数据 + 写文章 + 生成图片描述
 - 关键：任务拆解要清晰，子任务相互独立
 
@@ -148,23 +125,16 @@
 
 ---
 
-### Slide 17 — MCP：让 Claude 连接世界
+### Slide 14 — MCP：让 Claude 连接世界
 
 - MCP = Model Context Protocol
 - 类比：给 Claude 装插件
-- 重点介绍 3 个：
-  - `browser` → 操控浏览器
-  - `filesystem` → 读写本地文件
-  - `github` → 仓库操作
-- 配置方式：`claude_desktop_config.json`
-
----
-
-### Slide 18 — Agent 完备：渐进式披露
-
-- 概念：Claude 自己配置自己的工具链
-- 流程：需求 → Claude 分析 → 推荐 MCP → 自动写配置
-- `cc` 配置其他工具的 demo 截图
+- 重点介绍 4 个：
+  - `WordPress MCP` → 操控 WordPress 网站
+  - `Shopify MCP` → 操控 Shopify 店铺
+  - `卖家精灵 MCP` → 查亚马逊商品数据，挖掘爆款
+  - `Ahrefs MCP` → SEO 查词分析
+- 配置方式：查到相关文档，把文档直接丢给 Claude Code 自己去处理，人不要手动操作
 
 ---
 
@@ -199,7 +169,7 @@
 ### Slide 22 — Demo 4：RPA 自动化浏览器
 
 - 场景：批量表单填写 / 数据采集 / 定时操作
-- 依赖：browser MCP（Playwright/Puppeteer）
+- 依赖：TT Bridge（browser use / Playwright）
 - 展示：Claude 写脚本 → 自动执行 → 返回结果
 
 ---
