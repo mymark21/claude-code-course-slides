@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-slides-version="1">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -348,8 +348,8 @@
             display: none;
         }
 
-        .title-slide .slide-content {
-            box-shadow: 0 0 0 8px var(--bg-cream), 0 0 0 9px var(--border-light);
+        .title-slide h1 {
+            white-space: nowrap;
         }
 
         /* ===========================================
@@ -1172,13 +1172,19 @@
 
             loadFromStorage() {
                 const saved = localStorage.getItem('claude-code-slides-wabi');
-                if (saved) {
+                const savedVersion = localStorage.getItem('claude-code-slides-version');
+                const currentVersion = document.documentElement.dataset.slidesVersion || '1';
+                // 如果页面版本更新（新增了 slide），跳过旧缓存
+                if (saved && savedVersion === currentVersion) {
                     const data = JSON.parse(saved);
                     document.querySelectorAll('.slide').forEach((slide, index) => {
                         if (data[`slide-${index}`]) {
                             slide.innerHTML = data[`slide-${index}`];
                         }
                     });
+                } else if (savedVersion !== currentVersion) {
+                    localStorage.removeItem('claude-code-slides-wabi');
+                    localStorage.setItem('claude-code-slides-version', currentVersion);
                 }
             }
 
