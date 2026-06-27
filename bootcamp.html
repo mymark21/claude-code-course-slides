@@ -472,6 +472,18 @@
             cursor: text;
         }
 
+        /* Link styles — match the wabi-sabi aesthetic */
+        a, a:visited {
+            color: var(--accent-crimson);
+            text-decoration: none;
+            border-bottom: 1px solid var(--border-medium);
+            transition: color 0.25s ease, border-color 0.25s ease;
+        }
+        a:hover {
+            color: var(--accent-warm);
+            border-bottom-color: var(--accent-warm);
+        }
+
         /* ===========================================
            RESPONSIVE BREAKPOINTS
            =========================================== */
