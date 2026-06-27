@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude Code 实操训练营 Day 1</title>
+    <title>Claude Code 实操训练营</title>
 
     <!-- Fonts: Elegant serif + clean sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -560,6 +560,10 @@
     <section class="slide">
         <div class="slide-content">
             <h2 class="reveal">互动</h2>
+            <ul style="margin-top: var(--content-gap);">
+                <li class="reveal"><a href="games/lucky-wheel.html" target="_blank">幸运大转盘</a></li>
+                <li class="reveal"><a href="games/song-wheel.html" target="_blank">歌曲大转盘</a></li>
+            </ul>
         </div>
     </section>
 
@@ -678,7 +682,6 @@
             <h2 class="reveal">处理上下文</h2>
             <ul>
                 <li class="reveal">原则：<strong>一个对话 = 一个问题</strong></li>
-                <li class="reveal">对话变长时：<code>/compact</code> 压缩上下文</li>
                 <li class="reveal">回到旧对话：<code>/resume</code> + 对话 ID</li>
                 <li class="reveal">为什么重要：上下文污染 → 输出质量下降</li>
             </ul>
@@ -738,16 +741,17 @@
         </div>
     </section>
 
-    <!-- Slide 14: 快捷键 & Permission 模式 -->
+    <!-- Slide 13: 快捷键 & Auto Mode -->
     <section class="slide">
         <div class="slide-content">
-            <h2 class="reveal">快捷键 & Permission 模式</h2>
+            <h2 class="reveal">快捷键 & Auto Mode</h2>
             <ul>
                 <li class="reveal"><code>cc</code> 别名 = 快速启动</li>
-                <li class="reveal">Permission pass 状态：跳过每次操作确认</li>
+                <li class="reveal">Auto Mode On 状态：跳过每次操作确认</li>
                 <li class="reveal">适用场景：信任度高的任务 / 自动化流水线</li>
                 <li class="reveal"><span class="badge warning">⚠️ 注意</span> 不建议在陌生代码库开启</li>
             </ul>
+            <pre style="margin-top: var(--element-gap); font-size: var(--small-size); background: var(--bg-paper); padding: 0.8rem 1rem; border: 1px solid var(--border-light); border-radius: 4px; color: var(--text-secondary);">alias cc='claude --permission-mode auto'</pre>
         </div>
     </section>
 

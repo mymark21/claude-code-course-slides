@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>周杰伦金曲大转盘</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at top, #1a0533 0%, #0a0a1a 70%);
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    header h1 {
+      font-size: 36px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      background: linear-gradient(135deg, #fcd34d, #f97316, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+
+    .layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      width: min(100%, 1000px);
+    }
+
+    /* ---- Song List ---- */
+    .song-list {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 24px 20px;
+    }
+
+    .song-list h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fcd34d;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .song-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background .15s;
+      border: 1px solid transparent;
+    }
+
+    .song-item:hover {
+      background: rgba(255,255,255,0.06);
+    }
+
+    .song-item.active {
+      background: rgba(249,115,22,0.15);
+      border-color: rgba(249,115,22,0.4);
+    }
+
+    .rank {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .rank-1 { background: #fbbf24; color: #0a0a1a; }
+    .rank-2 { background: #9ca3af; color: #0a0a1a; }
+    .rank-3 { background: #cd7c3a; color: #0a0a1a; }
+    .rank-4, .rank-5, .rank-6, .rank-7, .rank-8, .rank-9, .rank-10 {
+      background: rgba(255,255,255,0.1);
+      color: #cbd5e1;
+    }
+
+    .song-info { flex: 1; min-width: 0; }
+
+    .song-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .song-meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .song-score {
+      flex-shrink: 0;
+    }
+
+    .stars { color: #fbbf24; font-size: 12px; letter-spacing: -1px; }
+
+    /* ---- Wheel Panel ---- */
+    .wheel-panel {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 24px 20px;
+      width: 380px;
+    }
+
+    .wheel-panel h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fcd34d;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: 320px;
+      height: 320px;
+    }
+
+    .pointer {
+      position: absolute;
+      left: 50%;
+      top: -6px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-top: 28px solid #fcd34d;
+      filter: drop-shadow(0 2px 6px rgba(252,211,77,0.6));
+      z-index: 10;
+    }
+
+    canvas#wheel {
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      box-shadow: 0 0 40px rgba(249,115,22,0.25), 0 8px 32px rgba(0,0,0,0.5);
+      transition: transform 5s cubic-bezier(.1, .85, .15, 1);
+    }
+
+    .spin-btn {
+      border: none;
+      background: linear-gradient(135deg, #f97316, #ec4899);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 999px;
+      padding: 13px 36px;
+      cursor: pointer;
+      transition: transform .12s, opacity .2s;
+      box-shadow: 0 8px 24px rgba(249,115,22,0.4);
+      letter-spacing: 1px;
+    }
+
+    .spin-btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .spin-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .result-box {
+      min-height: 56px;
+      width: 100%;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 16px;
+      text-align: center;
+    }
+
+    .result-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fcd34d;
+    }
+
+    .result-sub {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎵 周杰伦金曲大转盘</h1>
+    <p>十首经典金曲 · 转盘随机抽取</p>
+  </header>
+
+  <div class="layout">
+
+    <!-- 左：歌曲排行 -->
+    <div class="song-list">
+      <h2>🏆 经典金曲排行榜</h2>
+      <div id="songItems"></div>
+    </div>
+
+    <!-- 右：转盘 -->
+    <div class="wheel-panel">
+      <h2>🎲 随机抽曲</h2>
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="640" height="640"></canvas>
+      </div>
+      <button class="spin-btn" id="spinBtn">🎵 开始抽曲</button>
+      <div class="result-box">
+        <div>
+          <div class="result-text" id="resultText">点击按钮开始抽取</div>
+          <div class="result-sub" id="resultSub"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const songs = [
+      { rank: 1, name: "晴天",     album: "叶惠美 · 2003",  stars: 5, year: 2003 },
+      { rank: 2, name: "稻香",     album: "魔杰座 · 2008",  stars: 5, year: 2008 },
+      { rank: 3, name: "七里香",   album: "七里香 · 2004",  stars: 5, year: 2004 },
+      { rank: 4, name: "青花瓷",   album: "我很忙 · 2007",  stars: 5, year: 2007 },
+      { rank: 5, name: "双截棍",   album: "范特西 · 2001",  stars: 4, year: 2001 },
+      { rank: 6, name: "东风破",   album: "叶惠美 · 2003",  stars: 4, year: 2003 },
+      { rank: 7, name: "夜曲",     album: "十一月的萧邦 · 2005", stars: 4, year: 2005 },
+      { rank: 8, name: "菊花台",   album: "依然范特西 · 2006", stars: 4, year: 2006 },
+      { rank: 9, name: "以父之名", album: "叶惠美 · 2003",  stars: 4, year: 2003 },
+      { rank: 10, name: "告白气球", album: "周杰伦的床边故事 · 2016", stars: 4, year: 2016 },
+    ];
+
+    const colors = [
+      "#7c3aed", "#2563eb", "#0891b2", "#059669",
+      "#d97706", "#dc2626", "#db2777", "#7c3aed",
+      "#1d4ed8", "#0f766e"
+    ];
+
+    // Build song list
+    const listEl = document.getElementById("songItems");
+    songs.forEach(s => {
+      const starsStr = "★".repeat(s.stars) + "☆".repeat(5 - s.stars);
+      listEl.insertAdjacentHTML("beforeend", `
+        <div class="song-item" id="item-${s.rank}" data-rank="${s.rank}">
+          <div class="rank rank-${s.rank}">${s.rank}</div>
+          <div class="song-info">
+            <div class="song-name">${s.name}</div>
+            <div class="song-meta">${s.album}</div>
+          </div>
+          <div class="song-score"><div class="stars">${starsStr}</div></div>
+        </div>
+      `);
+    });
+
+    // Draw wheel
+    const canvas = document.getElementById("wheel");
+    const ctx = canvas.getContext("2d");
+    const SIZE = canvas.width;
+    const CENTER = SIZE / 2;
+    const RADIUS = SIZE / 2 - 12;
+    const ARC = (Math.PI * 2) / songs.length;
+
+    function drawWheel(rotOffset = 0) {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+
+      // outer ring
+      ctx.beginPath();
+      ctx.arc(CENTER, CENTER, RADIUS + 10, 0, Math.PI * 2);
+      ctx.fillStyle = "#1e1040";
+      ctx.fill();
+
+      songs.forEach((s, i) => {
+        const start = i * ARC - Math.PI / 2 + rotOffset;
+        const end = start + ARC;
+
+        ctx.beginPath();
+        ctx.moveTo(CENTER, CENTER);
+        ctx.arc(CENTER, CENTER, RADIUS, start, end);
+        ctx.closePath();
+        ctx.fillStyle = colors[i];
+        ctx.fill();
+        ctx.strokeStyle = "rgba(0,0,0,0.3)";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // text
+        ctx.save();
+        ctx.translate(CENTER, CENTER);
+        ctx.rotate(start + ARC / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#fff";
+        ctx.shadowColor = "rgba(0,0,0,0.6)";
+        ctx.shadowBlur = 4;
+        ctx.font = `bold 36px "PingFang SC","Microsoft YaHei",sans-serif`;
+        ctx.fillText(s.name, RADIUS - 30, 13);
+        ctx.restore();
+      });
+
+      // center hub
+      ctx.beginPath();
+      ctx.arc(CENTER, CENTER, 44, 0, Math.PI * 2);
+      ctx.fillStyle = "#0f0820";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(252,211,77,0.6)";
+      ctx.lineWidth = 4;
+      ctx.stroke();
+
+      ctx.fillStyle = "#fcd34d";
+      ctx.font = "bold 28px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🎵", CENTER, CENTER);
+    }
+
+    drawWheel();
+
+    // Spin logic
+    let currentDeg = 0;
+    let spinning = false;
+
+    function normDeg(d) { return ((d % 360) + 360) % 360; }
+
+    function pickWinner(finalDeg) {
+      const seg = 360 / songs.length;
+      const angle = normDeg(360 - normDeg(finalDeg));
+      const idx = Math.floor(angle / seg) % songs.length;
+      return songs[idx];
+    }
+
+    function highlightItem(rank) {
+      document.querySelectorAll(".song-item").forEach(el => el.classList.remove("active"));
+      const el = document.getElementById(`item-${rank}`);
+      if (el) {
+        el.classList.add("active");
+        el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    }
+
+    document.getElementById("spinBtn").addEventListener("click", () => {
+      if (spinning) return;
+      spinning = true;
+      const btn = document.getElementById("spinBtn");
+      btn.disabled = true;
+      document.getElementById("resultText").textContent = "🎲 抽取中...";
+      document.getElementById("resultSub").textContent = "";
+      document.querySelectorAll(".song-item").forEach(el => el.classList.remove("active"));
+
+      const rounds = 6 + Math.floor(Math.random() * 5);
+      const offset = Math.random() * 360;
+      const delta = rounds * 360 + offset;
+      currentDeg += delta;
+
+      canvas.style.transform = `rotate(${currentDeg}deg)`;
+
+      canvas.addEventListener("transitionend", function onEnd() {
+        canvas.removeEventListener("transitionend", onEnd);
+        const winner = pickWinner(currentDeg);
+        document.getElementById("resultText").textContent = `🎉 ${winner.name}`;
+        document.getElementById("resultSub").textContent = winner.album;
+        highlightItem(winner.rank);
+        btn.disabled = false;
+        spinning = false;
+      });
+    });
+  </script>
+</body>
+</html>

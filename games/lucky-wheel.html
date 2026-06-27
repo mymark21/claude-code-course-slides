@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>开心大转盘</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #f8fafc;
+      --accent: #f59e0b;
+      --btn: #2563eb;
+      --btn-hover: #1d4ed8;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #1e293b 0%, var(--bg) 60%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .game {
+      width: min(96vw, 600px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      background: rgba(17, 24, 39, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 24px 18px 28px;
+      backdrop-filter: blur(6px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-align: center;
+    }
+
+    .wheel-card {
+      background: rgba(15, 23, 42, 0.66);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 14px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .wheel-card h2 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .wheel-wrap {
+      position: relative;
+      width: min(78vw, 380px);
+      aspect-ratio: 1 / 1;
+    }
+
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), inset 0 0 0 10px #1f2937;
+      background: #0b1220;
+      transition: transform 5s cubic-bezier(.12, .85, .15, 1);
+    }
+
+    .pointer {
+      position: absolute;
+      left: 50%;
+      top: -8px;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 18px solid transparent;
+      border-right: 18px solid transparent;
+      border-top: 34px solid var(--accent);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+      z-index: 2;
+    }
+
+    .action-btn {
+      border: none;
+      background: var(--btn);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: transform .12s ease, background .2s ease, opacity .2s ease;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.4);
+    }
+
+    .action-btn:hover:not(:disabled) {
+      background: var(--btn-hover);
+      transform: translateY(-1px);
+    }
+
+    .action-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.65;
+      transform: none;
+    }
+
+    .result {
+      min-height: 28px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #fcd34d;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>🎯 开心大转盘</h1>
+
+    <section class="wheel-card">
+      <h2>Claude Code 训练营 · 第二期</h2>
+      <div class="wheel-wrap">
+        <div class="pointer" aria-hidden="true"></div>
+        <canvas id="luckyWheel" class="wheel" width="1000" height="1000" aria-label="开心大转盘"></canvas>
+      </div>
+      <button id="spinBtn" class="action-btn" type="button">抽取幸运观众</button>
+      <div id="result" class="result" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    const students = [
+      "Anna", "Eric", "阿梦", "Judy", "小马哥"
+    ];
+
+    const colors = [
+      "#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6"
+    ];
+
+    function normalizeDeg(deg) {
+      return ((deg % 360) + 360) % 360;
+    }
+
+    const canvas = document.getElementById("luckyWheel");
+    const ctx = canvas.getContext("2d");
+    const button = document.getElementById("spinBtn");
+    const result = document.getElementById("result");
+
+    const size = canvas.width;
+    const center = size / 2;
+    const radius = size / 2 - 16;
+    const anglePer = (Math.PI * 2) / students.length;
+
+    let currentRotation = 0;
+    let spinning = false;
+
+    function drawWheel() {
+      ctx.clearRect(0, 0, size, size);
+
+      for (let i = 0; i < students.length; i++) {
+        const start = i * anglePer - Math.PI / 2;
+        const end = start + anglePer;
+
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, start, end);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        const label = students[i];
+        const fontSize = 48;
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(start + anglePer / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "#ffffff";
+        ctx.font = `bold ${fontSize}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+        ctx.fillText(label, radius - 60, 16);
+        ctx.restore();
+      }
+
+      ctx.beginPath();
+      ctx.arc(center, center, 50, 0, Math.PI * 2);
+      ctx.fillStyle = "#111827";
+      ctx.fill();
+      ctx.lineWidth = 8;
+      ctx.strokeStyle = "#374151";
+      ctx.stroke();
+    }
+
+    function pickByRotation(finalRotationDeg) {
+      const segmentDeg = 360 / students.length;
+      const wheelAngle = normalizeDeg(finalRotationDeg);
+      const relative = normalizeDeg(360 - wheelAngle);
+      const index = Math.floor(relative / segmentDeg) % students.length;
+      return students[index];
+    }
+
+    drawWheel();
+
+    button.addEventListener("click", () => {
+      if (spinning) return;
+      spinning = true;
+      button.disabled = true;
+      result.textContent = "转盘转动中...";
+
+      const rounds = 6 + Math.floor(Math.random() * 4);
+      const randomOffset = Math.random() * 360;
+      const delta = rounds * 360 + randomOffset;
+      currentRotation += delta;
+
+      canvas.style.transform = `rotate(${currentRotation}deg)`;
+
+      const onEnd = () => {
+        canvas.removeEventListener("transitionend", onEnd);
+        const picked = pickByRotation(currentRotation);
+        result.textContent = `🎉 幸运观众：${picked}`;
+        button.disabled = false;
+        spinning = false;
+      };
+
+      canvas.addEventListener("transitionend", onEnd);
+    });
+  </script>
+</body>
+</html>
